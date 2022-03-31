@@ -1,4 +1,3 @@
-from pickletools import read_uint1
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 from entities import User, Role, MachineType, Machine, Maintenance
