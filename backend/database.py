@@ -1,4 +1,3 @@
-from typing import Dict
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 from entities import User, Role, MachineType, Machine
@@ -34,7 +33,7 @@ class Database:
         self._client = MongoClient(self._url)
         self._db = self._client[self._name]
 
-    def _initCollections(self) -> NOne:
+    def _initCollections(self) -> None:
         """Initializes the collections in the database"""
         collections = self._db.list_collection_names()
 
@@ -521,7 +520,3 @@ class Database:
         collection.update_one(
             {"machine_id": machine_id}, {"$set": {"machine_name": machine_new_name}}
         )
-
-
-if __name__ == "__main__":
-    main()

@@ -1,4 +1,3 @@
-from platform import machine
 from database import Database
 from string import ascii_uppercase
 from random import choice, randint, shuffle
