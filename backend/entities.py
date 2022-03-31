@@ -42,10 +42,11 @@ class User(Serializer):
 @dataclass
 class Maintenance(Serializer):
     maintenance_id: int
-    description: str
-    frequency: float
+    hours_between: float
+    description: str = None
 
 
+# ! not implemented yet
 @dataclass
 class Intervention(Serializer):
     timestamp: float
@@ -59,10 +60,11 @@ class Machine(Serializer):
     machine_name: str
     machine_type: int
     machine_hours: float = 0
-    maintenances_needed: list[Maintenance] = None
+    maintenances: list[Maintenance] = None
     interventions: list[Intervention] = None
 
 
+# ! not implemented yet
 @dataclass
 class Usage(Serializer):
     user_id: int

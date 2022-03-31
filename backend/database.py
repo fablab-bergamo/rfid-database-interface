@@ -1,6 +1,7 @@
+from pickletools import read_uint1
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
-from entities import User, Role, MachineType, Machine
+from entities import User, Role, MachineType, Machine, Maintenance
 import toml
 
 
@@ -48,6 +49,9 @@ class Database:
 
         if "machines" not in collections:
             self._db["machines"].create_index("machine_id", unique=True)
+
+        if "maintenances" not in collections:
+            self._db["maintenances"].create_index("maintenance_id", unique=True)
 
     def _queryCollection(self, collection_name: str) -> list[dict]:
         """Queries a collection and return the dict without the MongoDB mandatory _id
@@ -180,7 +184,7 @@ class Database:
 
         if user_id is None:
             # find the highest user id and add 1
-            user_id = collection.find({}).sort({user_id: -1}).limit(1) + 1
+            user_id = collection.find({}).sort({"user_id": -1}).limit(1) + 1
 
         u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
 
@@ -484,7 +488,6 @@ class Database:
             machine_type (int): machine type id
         """
         if machine_type not in [t.type_id for t in self.listMachineTypes()]:
-            print("EPIC FAIL")
             return
 
         collection = self._db["machines"]
@@ -509,6 +512,43 @@ class Database:
 
         return None
 
+    def addMachineMaintenance(self, machine_id: int, maintenance_id: int) -> None:
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            return
+
+        collection = self._db["machines"]
+        result = collection.find_one({"machine_id": machine_id})
+
+        if result:
+            if result["maintenances"] is None:
+                collection.update_one(
+                    {"machine_id": machine_id},
+                    {"$set": {"maintenances": [maintenance_id]}},
+                )
+            else:
+                collection.update_one(
+                    {"machine_id": machine_id},
+                    {"$push": {"maintenances": maintenance_id}},
+                )
+
+        return None
+
+    def getMachineMaintenances(self, machine_id: int) -> list[Maintenance]:
+        collection = self._db["machines"]
+        result = collection.find_one({"machine_id": machine_id})
+
+        if not result:
+            return
+
+        if not result["maintenances"]:
+            return []
+
+        return [
+            m
+            for m in self.listMaintenances()
+            if m.maintenance_id in result["maintenances"]
+        ]
+
     def setMachineName(self, machine_id: int, machine_new_name: str) -> None:
         """Sets the name of the machine
 
@@ -520,3 +560,34 @@ class Database:
         collection.update_one(
             {"machine_id": machine_id}, {"$set": {"machine_name": machine_new_name}}
         )
+
+    def addMaintenance(
+        self, hours_between: float, description: str = None, maintenance_id: int = None
+    ) -> int:
+        collection = self._db["maintenances"]
+
+        if maintenance_id is None:
+            # find the highest user id and add 1
+            maintenance_id = (
+                collection.find({}).sort({"maintenance_id": -1}).limit(1) + 1
+            )
+
+        m = Maintenance(
+            maintenance_id=maintenance_id,
+            hours_between=hours_between,
+            description=description,
+        )
+
+        try:
+            collection.insert_one(m.serialize())
+        except DuplicateKeyError:
+            return
+
+        return maintenance_id
+
+    def removeMaintenance(self, maintenance_id: int = None) -> None:
+        collection = self._db["maintenances"]
+        collection.delete_one({"maintenance_id": maintenance_id})
+
+    def listMaintenances(self) -> list[Maintenance]:
+        return [Maintenance.from_dict(m) for m in self._queryCollection("maintenances")]
