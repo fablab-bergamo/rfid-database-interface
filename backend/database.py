@@ -6,7 +6,7 @@ from exceptions import (
     InvalidQueryValueException,
 )
 
-from pymongo import MongoClient
+from pymongo import MongoClient, DESCENDING
 from pymongo.errors import DuplicateKeyError
 
 import toml
@@ -73,6 +73,7 @@ class Database:
         return list(collection.find(projection={"_id": 0}))
 
     def dropDatabase(self) -> None:
+        """Drop all colletions in database. Needless to say that this is pretty dangerous"""
         for c in self._db.list_collection_names():
             self._db.drop_collection(c)
 
@@ -90,6 +91,28 @@ class Database:
             collection.insert_one(r.serialize())
         except DuplicateKeyError:
             raise DuplicatedIdException("role", role_id)
+
+    def getRole(self, role_id: int) -> Role:
+        """Returns role by its id
+
+        Args:
+            role_id (int): id of the role
+
+        Returns:
+            Role
+        """
+        collection = self._db["roles"]
+
+        result = collection.find_one(
+            {"role_id": role_id}, projection={"_id": 0, "role_id": 1}
+        )
+
+        if not result:
+            return None
+
+        for r in self.listRoles():
+            if r.role_id == result["role_id"]:
+                return r
 
     def editRoleName(self, role_id: int, new_role_name: str) -> None:
         """Changes the name of a role
@@ -135,6 +158,28 @@ class Database:
             collection.insert_one(t.serialize())
         except DuplicateKeyError:
             raise DuplicatedIdException("type", type_id)
+
+    def getMachineType(self, type_id: int) -> MachineType:
+        """Returns role by its id
+
+        Args:
+            type_id (int): id of the type
+
+        Returns:
+            MachineType
+        """
+        collection = self._db["machine_types"]
+
+        result = collection.find_one(
+            {"type_id": type_id}, projection={"_id": 0, "type_id": 1}
+        )
+
+        if not result:
+            return None
+
+        for t in self.listMachineTypes():
+            if t.type_id == result["type_id"]:
+                return t
 
     def editMachineTypeName(self, type_id: int, new_type_name: str) -> None:
         """Changes the name of a machine type
@@ -188,14 +233,18 @@ class Database:
         Returns:
             int: id of the user
         """
-        if role_id and all(r.role_id != role_id for r in self.listRoles()):
+        if role_id is not None and all(r.role_id != role_id for r in self.listRoles()):
             raise InvalidIdException("role", role_id)
 
         collection = self._db["users"]
 
         if user_id is None:
-            # find the highest user id and add 1
-            user_id = collection.find({}).sort({"user_id": -1}).limit(1) + 1
+            if collection.count_documents({}) == 0:
+                user_id = 0
+            else:
+                # find the highest user id and add 1
+                last = list(collection.find({}).sort("user_id", DESCENDING).limit(1))[0]
+                user_id = last["user_id"] + 1
 
         u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
 
@@ -203,7 +252,7 @@ class Database:
             collection.insert_one(u.serialize())
             return user_id
         except DuplicateKeyError:
-            DuplicatedIdException("user", user_id)
+            raise DuplicatedIdException("user", user_id)
 
     def listUsers(self) -> list[User]:
         """Returns all users in database
@@ -255,7 +304,7 @@ class Database:
             role_id (int): id of the role
         """
         if all(r.role_id != role_id for r in self.listRoles()):
-            InvalidIdException("role", role_id)
+            raise InvalidIdException("role", role_id)
 
         collection = self._db["users"]
         collection.update_one({"user_id": user_id}, {"$set": {"role_id": role_id}})
@@ -474,7 +523,7 @@ class Database:
             {"machine_id": machine_id}, {"$set": {"hours_used": machine_hours}}
         )
 
-    def getMachineType(self, machine_id: int) -> int:
+    def getTypeOfMachine(self, machine_id: int) -> int:
         """Get the type of the machine
 
         Args:
@@ -578,10 +627,14 @@ class Database:
         collection = self._db["maintenances"]
 
         if maintenance_id is None:
-            # find the highest user id and add 1
-            maintenance_id = (
-                collection.find({}).sort({"maintenance_id": -1}).limit(1) + 1
-            )
+            if collection.count_documents({}) == 0:
+                maintenance_id = 0
+            else:
+                # find the highest user id and add 1
+                last = list(
+                    collection.find({}).sort("maintenance_id", DESCENDING).limit(1)
+                )[0]
+                maintenance_id = last["maintenance_id"] + 1
 
         m = Maintenance(
             maintenance_id=maintenance_id,
