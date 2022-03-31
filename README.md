@@ -10,7 +10,7 @@ The organization's Crew, performing specialistic maintenance, allowed to add new
 A registered member of the organizzation.
 #### User proprieties
 - Membership number (like E000000)
-- Anagraphic data
+- UID of the card?
 - Allowed machine types (filament 3D printers, resin 3D printers, lasers, CNC mills, other?)
 
 ## Endpoints
