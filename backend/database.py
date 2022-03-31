@@ -1,6 +1,14 @@
+from entities import User, Role, MachineType, Machine, Maintenance
+from exceptions import (
+    DuplicatedIdException,
+    InvalidIdException,
+    MissingQueryValueException,
+    InvalidQueryValueException,
+)
+
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
-from entities import User, Role, MachineType, Machine, Maintenance
+
 import toml
 
 
@@ -64,6 +72,10 @@ class Database:
         collection = self._db[collection_name]
         return list(collection.find(projection={"_id": 0}))
 
+    def dropDatabase(self) -> None:
+        for c in self._db.list_collection_names():
+            self._db.drop_collection(c)
+
     def addRole(self, role_id: int, role_name: str) -> None:
         """Adds a role to the database
 
@@ -77,7 +89,7 @@ class Database:
         try:
             collection.insert_one(r.serialize())
         except DuplicateKeyError:
-            return
+            raise DuplicatedIdException("role", role_id)
 
     def editRoleName(self, role_id: int, new_role_name: str) -> None:
         """Changes the name of a role
@@ -122,7 +134,7 @@ class Database:
         try:
             collection.insert_one(t.serialize())
         except DuplicateKeyError:
-            return
+            raise DuplicatedIdException("type", type_id)
 
     def editMachineTypeName(self, type_id: int, new_type_name: str) -> None:
         """Changes the name of a machine type
@@ -177,7 +189,7 @@ class Database:
             int: id of the user
         """
         if role_id and all(r.role_id != role_id for r in self.listRoles()):
-            return
+            raise InvalidIdException("role", role_id)
 
         collection = self._db["users"]
 
@@ -191,7 +203,7 @@ class Database:
             collection.insert_one(u.serialize())
             return user_id
         except DuplicateKeyError:
-            return None
+            DuplicatedIdException("user", user_id)
 
     def listUsers(self) -> list[User]:
         """Returns all users in database
@@ -243,7 +255,7 @@ class Database:
             role_id (int): id of the role
         """
         if all(r.role_id != role_id for r in self.listRoles()):
-            return
+            InvalidIdException("role", role_id)
 
         collection = self._db["users"]
         collection.update_one({"user_id": user_id}, {"$set": {"role_id": role_id}})
@@ -294,8 +306,8 @@ class Database:
         Returns:
             int: User id
         """
-        if user_name is None and user_surname is None:
-            return
+        if user_name is None or user_surname is None:
+            raise MissingQueryValueException("name and surname", "user")
 
         user = self.getUser(user_name=user_name, user_surname=user_surname)
 
@@ -317,15 +329,15 @@ class Database:
         """
 
         if not isinstance(authorization_ids, list):
-            return
+            raise InvalidQueryValueException("authorization ids", authorization_ids)
 
         machine_types = [m.type_id for m in self.listMachineTypes()]
         for i in authorization_ids:
             if not isinstance(i, int):
-                return
+                raise InvalidQueryValueException("authorization id", i)
 
             if i not in machine_types:
-                return
+                raise InvalidIdException("machine type", i)
 
         collection = self._db["users"]
         collection.update_one(
@@ -414,7 +426,7 @@ class Database:
         try:
             collection.insert_one(m.serialize())
         except DuplicateKeyError:
-            return
+            raise DuplicatedIdException("machine", machine_id)
 
     def removeMachine(self, machine_id: int) -> None:
         """Removes a machine from the database
@@ -580,7 +592,7 @@ class Database:
         try:
             collection.insert_one(m.serialize())
         except DuplicateKeyError:
-            return
+            raise DuplicatedIdException("maintenance", maintenance_id)
 
         return maintenance_id
 
