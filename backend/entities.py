@@ -34,6 +34,7 @@ class Role(Serializer):
 
     role_id: int
     role_name: str
+    authorize_all: bool = False
 
 
 @dataclass
@@ -88,13 +89,12 @@ class Machine(Serializer):
     interventions: list[Intervention] = None
 
 
-# ! not implemented yet
 @dataclass
-class Usage(Serializer):
-    """Dataclass handling a use."""
+class Use(Serializer):
+    """Dataclass handling machine use."""
 
+    use_id: int
     user_id: int
     machine_id: int
-    started_timestamp: float
-    ended_timestamp: float
-    duration: float
+    start_timestamp: float
+    end_timestamp: float = None

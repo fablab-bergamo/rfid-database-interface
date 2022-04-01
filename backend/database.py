@@ -1,6 +1,6 @@
 """This is the class handling the Database. More to come."""
 
-from entities import User, Role, MachineType, Machine, Maintenance, Intervention
+from entities import User, Role, MachineType, Machine, Maintenance, Intervention, Use
 from exceptions import (
     DuplicatedIdException,
     InvalidIdException,
@@ -36,6 +36,7 @@ class Database:
             "machines": "machine_id",
             "maintenances": "maintenance_id",
             "interventions": "intervention_id",
+            "uses": "use_id",
         }
 
         self._loadSettings()
@@ -73,12 +74,48 @@ class Database:
         collection = self._db[collection_name]
         return list(collection.find(projection={"_id": 0}))
 
+    def _getUserIdFromCard(self, card_UUID: str = None) -> int:
+        collection = self._db["users"]
+        result = collection.find_one({"card_UUID": card_UUID})
+        return result["user_id"]
+
+    def _validateRole(self, role_id: int) -> bool:
+        collection = self._db["roles"]
+        return collection.count_documents({"role_id": role_id}) == 1
+
+    def _validateMachineType(self, type_id: int) -> bool:
+        collection = self._db["machine_types"]
+        return collection.count_documents({"type_id": type_id}) == 1
+
+    def _validateUser(self, user_id: int) -> bool:
+        collection = self._db["users"]
+        return collection.count_documents({"user_id": user_id}) == 1
+
+    def _validateMachine(self, machine_id: int) -> bool:
+        collection = self._db["machines"]
+        return collection.count_documents({"machine_id": machine_id}) == 1
+
+    def _validateMaintenance(self, maintenance_id: int) -> bool:
+        collection = self._db["maintenances"]
+        return collection.count_documents({"maintenance_id": maintenance_id}) == 1
+
+    def _isUserCurrentlyUsing(self, machine_id: int, user_id: int) -> bool:
+        collection = self._db["uses"]
+        return (
+            collection.count_documents(
+                {"user_id": user_id, "machine_id": machine_id, "end_timestamp": None}
+            )
+            > 0
+        )
+
     def dropDatabase(self) -> None:
         """Drop all colletions in database. Needless to say that this is pretty dangerous."""
         for c in self._db.list_collection_names():
             self._db.drop_collection(c)
 
-    def addRole(self, role_id: int, role_name: str) -> None:
+    def addRole(
+        self, role_id: int, role_name: str, authorize_all: bool = False
+    ) -> None:
         """Add a Role to the database.
 
         Args:
@@ -86,7 +123,7 @@ class Database:
             role_name (str): name of the Role
         """
         collection = self._db["roles"]
-        r = Role(role_id=role_id, role_name=role_name)
+        r = Role(role_id=role_id, role_name=role_name, authorize_all=authorize_all)
 
         try:
             collection.insert_one(r.serialize())
@@ -234,7 +271,7 @@ class Database:
         Returns:
             int: id of the User
         """
-        if all(r.role_id != role_id for r in self.listRoles()):
+        if not self._validateRole(role_id=role_id):
             raise InvalidIdException("Role id", role_id)
 
         collection = self._db["users"]
@@ -310,7 +347,7 @@ class Database:
             user_id (int): id of the User
             role_id (int): id of the Role
         """
-        if all(r.role_id != role_id for r in self.listRoles()):
+        if not self._validateRole(role_id=role_id):
             raise InvalidIdException("Role id", role_id)
 
         collection = self._db["users"]
@@ -414,6 +451,9 @@ class Database:
         if result is None:
             raise InvalidIdException("User", user_id)
 
+        if not result["authorization_ids"]:
+            return []
+
         authorizations = []
         for t in self.listMachineTypes():
             if t.type_id in result["authorization_ids"]:
@@ -472,7 +512,7 @@ class Database:
         """
         collection = self._db["machines"]
 
-        if all(machine_type != t.type_id for t in self.listMachineTypes()):
+        if not self._validateMachineType(type_id=machine_type):
             raise InvalidQueryException("Machine type", machine_type)
 
         m = Machine(
@@ -623,14 +663,14 @@ class Database:
             machine_id (int): id of the Machine
             maintenance_id (int): id of the Maintenance
         """
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException("Maintenance", maintenance_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException("Machine", machine_id)
 
         collection = self._db["machines"]
         result = collection.find_one({"machine_id": machine_id})
-
-        if result is None:
-            raise InvalidIdException("Machine", machine_id)
 
         if not result["maintenances"]:
             collection.update_one(
@@ -671,22 +711,22 @@ class Database:
             machine_id (int): id of the Machine
             maintenance_id (int): id of the Maintenances
         """
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException("Maintenance", maintenance_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException("Machine", machine_id)
 
         collection = self._db["machines"]
         result = collection.find_one({"machine_id": machine_id})
 
-        if result is None:
+        if len(result["maintenances"]) == 0:
             raise InvalidIdException("Machine", machine_id)
 
-        if not result["maintenances"]:
-            raise InvalidIdException("Machine", machine_id)
-        else:
-            collection.update_one(
-                {"machine_id": machine_id},
-                {"$pull": {"maintenances": maintenance_id}},
-            )
+        collection.update_one(
+            {"machine_id": machine_id},
+            {"$pull": {"maintenances": maintenance_id}},
+        )
 
     def addMaintenance(
         self, hours_between: float, description: str = None, maintenance_id: int = None
@@ -853,13 +893,13 @@ class Database:
         Returns:
             int: id of the Intervention
         """
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException("Maintenance", maintenance_id)
 
-        if all(machine_id != m.machine_id for m in self.listMachines()):
+        if not self._validateMachine(machine_id=machine_id):
             raise InvalidIdException("Machine", machine_id)
 
-        if all(user_id != u.user_id for u in self.listUsers()):
+        if not self._validateUser(user_id=user_id):
             raise InvalidIdException("User", user_id)
 
         if timestamp is None:
@@ -983,3 +1023,226 @@ class Database:
             raise InvalidIdException("Intervention", intervention_id)
 
         return result["timestamp"]
+
+    def startUse(
+        self,
+        machine_id: int,
+        user_id: int = None,
+        card_UUID: str = None,
+        timestamp: float = None,
+    ) -> None:
+        """Start use of a Machine for a certain User.
+
+        Args:
+            machine_id (int): id of a Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+            timestamp (float, optional): start timestamp. If not passed, current time will be used
+        """
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User", user_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(
+                "Machine",
+                machine_id,
+            )
+
+        if self.isMachineCurrentlyUsed(machine_id=machine_id):
+            raise InvalidIdException(
+                "Machine",
+                machine_id,
+            )
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db["uses"]
+
+        if collection.count_documents({}) == 0:
+            use_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(collection.find({}).sort("use_id", DESCENDING).limit(1))[0]
+            use_id = last["use_id"] + 1
+
+        u = Use(
+            use_id=use_id,
+            user_id=user_id,
+            machine_id=machine_id,
+            start_timestamp=timestamp,
+        )
+
+        collection.insert_one(u.serialize())
+
+    def endUse(
+        self,
+        machine_id: int,
+        user_id: int = None,
+        card_UUID: str = None,
+        timestamp: float = None,
+    ) -> float:
+        """End a use that was previously started.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+            timestamp (float, optional): start timestamp. If not passed, current time will be used
+
+        Returns:
+            float: duration of the Use
+        """
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User", user_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(
+                "Machine",
+                machine_id,
+            )
+
+        if not self._isUserCurrentlyUsing(machine_id=machine_id, user_id=user_id):
+            raise InvalidQueryException("User", user_id)
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db["uses"]
+        collection.update_one(
+            {"user_id": user_id, "machine_id": machine_id, "end_timestamp": None},
+            {"$set": {"end_timestamp": timestamp}},
+        )
+
+        result = collection.find_one({"end_timestamp": timestamp})
+        return timestamp - result["start_timestamp"]
+
+    # helper methods
+    def getUserUses(self, user_id: int = None, card_UUID: str = None) -> list[Use]:
+        """Return uses from a certain user.
+
+        Args:
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            list[Use]
+        """
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User", user_id)
+
+        collection = self._db["uses"]
+        results = collection.find({"user_id": user_id}, projection={"_id": 0})
+
+        return [Use.from_dict(r) for r in results]
+
+    def isMachineCurrentlyUsed(self, machine_id: int) -> bool:
+        """Return True if the machine is currently being used, False otherwise.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            bool
+        """
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException("Machine", machine_id)
+
+        collection = self._db["uses"]
+        return (
+            collection.count_documents(
+                {"machine_id": machine_id, "end_timestamp": None}
+            )
+            == 1
+        )
+
+    def getCurrentlyUsedMachines(self) -> list[Machine]:
+        """Get a list of the Machine that are being used in this moment.
+
+        Returns:
+            list[Machine]
+        """
+        collection = self._db["uses"]
+        results = collection.find({"end_timestamp": None}, projection={"_id": 0})
+        return [Machine.from_dict(r["machine_id"]) for r in results]
+
+    def getUserTotalTime(self, user_id: int) -> float:
+        """Return total time the User has used the machines.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            float: User time in seconds
+        """
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User", user_id)
+
+        collection = self._db["uses"]
+        uses = collection.find(
+            {"user_id": user_id, "end_timestamp": {"$exists": True, "$ne": None}}
+        )
+        total = 0
+        for u in uses:
+            total += u["end_timestamp"] - u["start_timestamp"]
+        return total
+
+    def isUserAuthroizedForMachine(
+        self, machine_id: int, user_id: int = None, card_UUID: str = None
+    ) -> bool:
+        """Return True if a User is authorized to use a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            bool
+        """
+        if user_id is None and card_UUID is None:
+            raise InvalidQueryException("User", "user id or card UUID")
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException("Machine id", machine_id)
+
+        if user_id is None:
+            user_id = self.getUserFromCardUUID(card_UUID=card_UUID).user_id
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User id", user_id)
+
+        role = self.getUserRole(user_id)
+        if role.authorize_all:
+            return True
+
+        machine_type = self.getMachineMachineType(machine_id)
+        authorizations = self.getUserAuthorization(user_id)
+
+        return any(a.type_id == machine_type for a in authorizations)
+
+    def getUserFromCardUUID(self, card_UUID: str) -> User:
+        """Return user from the UUID of its card.
+
+        Args:
+            card_UUID (str): UUID of the card
+
+        Returns:
+            User
+        """
+        collection = self._db["users"]
+        result = collection.find_one({"card_UUID": card_UUID}, projection={"_id": 0})
+
+        if not result:
+            raise InvalidQueryException("Card UUID", card_UUID)
+
+        return User.from_dict(result)
