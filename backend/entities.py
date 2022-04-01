@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from typing import Dict
-from ujson import loads
 
 
 class Serializer:
@@ -15,19 +14,6 @@ class Serializer:
             Dict
         """
         return self.__dict__
-
-    @classmethod
-    def deserialize(cls, str_data: str) -> object:
-        """Deserialize data and return an object. JSON compatible.
-
-        Args:
-            str_data (str): string data. JSON compatible
-
-        Returns:
-            object: appropriate object type
-        """
-        params = loads(str_data.replace("'", '"'))
-        return cls(**params)
 
     @classmethod
     def from_dict(cls, dict_data: dict) -> object:
@@ -79,15 +65,15 @@ class Maintenance(Serializer):
     description: str = None
 
 
-# ! not implemented yet
 @dataclass
 class Intervention(Serializer):
     """Dataclass handling an intervention."""
 
-    maintenance_id: int
-    timestamp: float
     intervention_id: int
+    maintenance_id: int
+    machine_id: int
     user_id: int
+    timestamp: float
 
 
 @dataclass

@@ -16,13 +16,7 @@ class InvalidIdException(DatabaseException):
         super().__init__(message)
 
 
-class MissingQueryValueException(DatabaseException):
-    def __init__(self, entity: str, value: str):
-        message = f"Missing value for {value} while querying for entity {entity}"
-        super().__init__(message)
-
-
-class InvalidQueryValueException(DatabaseException):
+class InvalidQueryException(DatabaseException):
     def __init__(self, entity: str, value: str):
         message = f"Invalid value for {value} while querying for entity {entity}"
         super().__init__(message)
