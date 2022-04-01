@@ -1,0 +1,3283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>database API documentation</title>
+<meta name="description" content="This is the class handling the Database. More to come." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>database</code></h1>
+</header>
+<section id="section-intro">
+<p>This is the class handling the Database. More to come.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;This is the class handling the Database. More to come.&#34;&#34;&#34;
+
+from entities import User, Role, MachineType, Machine, Maintenance
+from exceptions import (
+    DuplicatedIdException,
+    InvalidIdException,
+    MissingQueryValueException,
+    InvalidQueryValueException,
+)
+
+from pymongo import MongoClient, DESCENDING
+from pymongo.errors import DuplicateKeyError
+
+import toml
+
+
+class Database:
+    &#34;&#34;&#34;Class handling the connection from and to the database.&#34;&#34;&#34;
+
+    def __init__(self, settings_path=&#34;settings.toml&#34;) -&gt; None:
+        &#34;&#34;&#34;Create instance of Database.
+
+        Args:
+            settings_path (str, optional): TOML file settings. Defaults to &#34;settings.toml&#34;.
+        &#34;&#34;&#34;
+        self._settings_path = settings_path
+
+        self._client = None
+        self._db = None
+
+        # dict of collections and its relative unique index
+        self._collections = {
+            &#34;roles&#34;: &#34;role_id&#34;,
+            &#34;machine_types&#34;: &#34;type_id&#34;,
+            &#34;users&#34;: &#34;user_id&#34;,
+            &#34;machines&#34;: &#34;machine_id&#34;,
+            &#34;maintenances&#34;: &#34;maintenance_id&#34;,
+        }
+
+        self._loadSettings()
+        self._connect()
+        self._initCollections()
+
+    def _loadSettings(self) -&gt; None:
+        &#34;&#34;&#34;Load settings from TOML file.&#34;&#34;&#34;
+        self._settings = toml.load(self._settings_path)
+        self._url = self._settings[&#34;database&#34;][&#34;url&#34;]
+        self._name = self._settings[&#34;database&#34;][&#34;name&#34;]
+
+    def _connect(self) -&gt; None:
+        &#34;&#34;&#34;Connect to MongoDB server.&#34;&#34;&#34;
+        self._client = MongoClient(self._url)
+        self._db = self._client[self._name]
+
+    def _initCollections(self) -&gt; None:
+        &#34;&#34;&#34;Initialize the collections in the database.&#34;&#34;&#34;
+        collections = self._db.list_collection_names()
+
+        for c, i in self._collections.items():
+            if c not in collections:
+                self._db[c].create_index(i, unique=True)
+
+    def _queryCollection(self, collection_name: str) -&gt; list[dict]:
+        &#34;&#34;&#34;Query a collection and return the dict without the MongoDB mandatory _id.
+
+        Args:
+            collection_name (str): name of the collection
+
+        Returns:
+            list[dict]: list of dicts as returned from MongoDB
+        &#34;&#34;&#34;
+        collection = self._db[collection_name]
+        return list(collection.find(projection={&#34;_id&#34;: 0}))
+
+    def dropDatabase(self) -&gt; None:
+        &#34;&#34;&#34;Drop all colletions in database. Needless to say that this is pretty dangerous.&#34;&#34;&#34;
+        for c in self._db.list_collection_names():
+            self._db.drop_collection(c)
+
+    def addRole(self, role_id: int, role_name: str) -&gt; None:
+        &#34;&#34;&#34;Add a Role to the database.
+
+        Args:
+            role_id (int): id of the Role
+            role_name (str): name of the Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;roles&#34;]
+        r = Role(role_id, role_name)
+
+        try:
+            collection.insert_one(r.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Role&#34;, role_id)
+
+    def getRole(self, role_id: int) -&gt; Role:
+        &#34;&#34;&#34;Return Role by its id.
+
+        Args:
+            role_id (int): id of the Role
+
+        Returns:
+            Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;roles&#34;]
+
+        result = collection.find_one(
+            {&#34;role_id&#34;: role_id}, projection={&#34;_id&#34;: 0, &#34;role_id&#34;: 1}
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Role id&#34;, role_id)
+
+        for r in self.listRoles():
+            if r.role_id == result[&#34;role_id&#34;]:
+                return r
+
+    def editRoleName(self, role_id: int, new_role_name: str) -&gt; None:
+        &#34;&#34;&#34;Change the name of a Role.
+
+        Args:
+            role_id (int): id of the Role
+            new_role_name (str): new name of the Role
+        &#34;&#34;&#34;
+        r = Role(role_id, new_role_name)
+        collection = self._db[&#34;roles&#34;]
+        collection.update_one(
+            {&#34;role_id&#34;: role_id}, {&#34;$set&#34;: {&#34;role_name&#34;: r.role_name}}
+        )
+
+    def removeRole(self, role_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a Role from the database.
+
+        Args:
+            role_id (int): id of the Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;roles&#34;]
+        collection.delete_one({&#34;role_id&#34;: role_id})
+
+    def listRoles(self) -&gt; list[Role]:
+        &#34;&#34;&#34;List all Roles in the database.
+
+        Returns:
+            list[Role]: list of all Roles
+        &#34;&#34;&#34;
+        return [Role.from_dict(r) for r in self._queryCollection(&#34;roles&#34;)]
+
+    def addMachineType(self, type_id: int, type_name: str) -&gt; None:
+        &#34;&#34;&#34;Add a MachineType to the database.
+
+        Args:
+            type_id (int): id of the MachineType
+            type_name (str): name of the MachineType
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machine_types&#34;]
+        t = MachineType(type_id, type_name)
+
+        try:
+            collection.insert_one(t.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Type&#34;, type_id)
+
+    def getMachineType(self, type_id: int) -&gt; MachineType:
+        &#34;&#34;&#34;Return MachineType by it id.
+
+        Args:
+            type_id (int): id of the MachineType
+
+        Returns:
+            MachineType
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machine_types&#34;]
+
+        result = collection.find_one(
+            {&#34;type_id&#34;: type_id}, projection={&#34;_id&#34;: 0, &#34;type_id&#34;: 1}
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;MachineType id&#34;, type_id)
+
+        for t in self.listMachineTypes():
+            if t.type_id == result[&#34;type_id&#34;]:
+                return t
+
+    def editMachineTypeName(self, type_id: int, new_type_name: str) -&gt; None:
+        &#34;&#34;&#34;Change the name of a MachineType.
+
+        Args:
+            type_id (int): id of the MachineType
+            new_type_name (str): new name of the type
+        &#34;&#34;&#34;
+        t = MachineType(type_id, new_type_name)
+        collection = self._db[&#34;machine_types&#34;]
+        collection.update_one(
+            {&#34;type_id&#34;: type_id}, {&#34;$set&#34;: {&#34;type_name&#34;: t.type_name}}
+        )
+
+    def removeMachineType(self, type_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a MachineType from the database.
+
+        Args:
+            type_id (int): id of the MachineType
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machine_types&#34;]
+        collection.delete_one({&#34;type_id&#34;: type_id})
+
+    def listMachineTypes(self) -&gt; list[MachineType]:
+        &#34;&#34;&#34;List all Machine types in the database.
+
+        Returns:
+            list[MachineType]: list of all Machine types
+        &#34;&#34;&#34;
+        return [
+            MachineType.from_dict(t) for t in self._queryCollection(&#34;machine_types&#34;)
+        ]
+
+    def addUser(
+        self,
+        name: str,
+        surname: str,
+        user_id: int = None,
+        role_id: int = None,
+        card_UUID: str = None,
+    ) -&gt; int:
+        &#34;&#34;&#34;Add a User to the database.
+
+        Args:
+            name (str): Name of the User
+            surname (str): Surname of the User
+            user_id (int, optional): id of the User, optional. Will be assigned automatically.
+            role_id (int, optional): id of the Role.
+            card_UUID (str, optional): UUID of the RFID card.
+
+        Returns:
+            int: id of the User
+        &#34;&#34;&#34;
+        if role_id is not None and all(
+            r.role_id != role_id for r in self.listMachines()
+        ):
+            raise InvalidIdException(&#34;Role id&#34;, role_id)
+
+        collection = self._db[&#34;users&#34;]
+
+        if user_id is None:
+            if collection.count_documents({}) == 0:
+                user_id = 0
+            else:
+                # find the highest User id and add 1
+                last = list(collection.find({}).sort(&#34;user_id&#34;, DESCENDING).limit(1))[0]
+                user_id = last[&#34;user_id&#34;] + 1
+
+        u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
+
+        try:
+            collection.insert_one(u.serialize())
+            return user_id
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;User&#34;, user_id)
+
+    def listUsers(self) -&gt; list[User]:
+        &#34;&#34;&#34;Return all User in database.
+
+        Returns:
+            list[User]: list of users
+        &#34;&#34;&#34;
+        return [User.from_dict(u) for u in self._queryCollection(&#34;users&#34;)]
+
+    def getUser(
+        self, user_id: int = None, user_name: str = None, user_surname: str = None
+    ) -&gt; User:
+        &#34;&#34;&#34;Return a User from its user_id or its combination of name and surname.
+
+        Args:
+            user_id (int, optional): id of the User. Not necessary if name and surnames are provided
+            user_name (str, optional): name of the User. Must be passed along the surname. \
+            Not necessary if id is provided.
+            user_surname (str, optional): surname of the User. Must be passed along the name. \
+            Not necessary if id is provided.
+
+        Returns:
+            User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        result = None
+
+        if user_name and user_surname:
+            result = collection.find_one(
+                {&#34;name&#34;: user_name, &#34;surname&#34;: user_surname}, projection={&#34;_id&#34;: 0}
+            )
+        elif user_id is not None:
+            result = collection.find_one({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;User id&#34;, user_id)
+
+        return User.from_dict(result)
+
+        return None
+
+    def setUserRole(
+        self,
+        user_id: int,
+        role_id: int,
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the Role of a User.
+
+        Args:
+            user_id (int): id of the User
+            role_id (int): id of the Role
+        &#34;&#34;&#34;
+        if all(r.role_id != role_id for r in self.listMachines()):
+            raise InvalidIdException(&#34;Role id&#34;, role_id)
+
+        collection = self._db[&#34;users&#34;]
+        collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;role_id&#34;: role_id}})
+
+    def getUserRole(self, user_id: int) -&gt; Role:
+        &#34;&#34;&#34;Return the Role of a User.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+
+        result = collection.find_one(
+            {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;role_id&#34;: 1}
+        )
+
+        if result is None:
+            return None
+
+        for r in self.listMachines():
+            if r.role_id == result[&#34;role_id&#34;]:
+                return r
+
+    def setUserId(
+        self,
+        user_id: int,
+        new_id: int,
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the id of a User.
+
+        Args:
+            user_id (int): id of the User
+            new_id (int): new id of the User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;user_id&#34;: new_id}})
+
+    def getUserId(self, user_name: str = None, user_surname: str = None) -&gt; int:
+        &#34;&#34;&#34;Get a User id from its name and surname.
+
+        Args:
+            user_name (str): Name of the User.
+            user_surname (str): Surname of the User
+
+        Returns:
+            int: User id
+        &#34;&#34;&#34;
+        if user_name is None or user_surname is None:
+            raise MissingQueryValueException(&#34;Name and Surname&#34;, None)
+
+        user = self.getUser(user_name=user_name, user_surname=user_surname)
+
+        if user:
+            return user.user_id
+
+        return None
+
+    def setUserAuthorization(
+        self,
+        user_id: int,
+        authorization_ids: list[int],
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the authorization for an User.
+
+        Args:
+            user_id (int): id of the User
+            authorization_ids (list[int]): Machine types that the User is authorized to use
+        &#34;&#34;&#34;
+        if not isinstance(authorization_ids, list):
+            raise InvalidQueryValueException(&#34;Authorization ids&#34;, authorization_ids)
+
+        machine_types = [m.type_id for m in self.listMachineTypes()]
+        for i in authorization_ids:
+            if not isinstance(i, int):
+                raise InvalidQueryValueException(&#34;Authorization id&#34;, i)
+
+            if i not in machine_types:
+                raise InvalidIdException(&#34;MachineType&#34;, i)
+
+        collection = self._db[&#34;users&#34;]
+        collection.update_one(
+            {&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;authorization_ids&#34;: authorization_ids}}
+        )
+
+    def getUserAuthorization(self, user_id: int) -&gt; list[MachineType]:
+        &#34;&#34;&#34;Return the authorization of a User.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            list[MachineType]: list of Machine types the User is authorized to use
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+
+        result = collection.find_one(
+            {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;authorization_ids&#34;: 1}
+        )
+
+        if result is None:
+            return None
+
+        authorizations = []
+        for t in self.listMachineTypes():
+            if t.type_id in result[&#34;authorization_ids&#34;]:
+                authorizations.append(t)
+
+        return authorizations
+
+    def setUserCardUUID(
+        self,
+        user_id: int,
+        card_UUID: str,
+    ):
+        &#34;&#34;&#34;Set the UUID of the RFID card for a User.
+
+        Args:
+            user_id (int): id of the User
+            card_UUID (str): UUID of the RFID card
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;card_UUID&#34;: card_UUID}})
+
+    def getUserCardUUID(self, user_id: int) -&gt; str:
+        &#34;&#34;&#34;Get the UUID of the card of a User according to its id.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            str: UUID of the RFID card
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+
+        result = collection.find_one(
+            {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;card_UUID&#34;: 1}
+        )
+
+        if result is None:
+            return None
+
+        return result[&#34;card_UUID&#34;]
+
+    def addMachine(
+        self,
+        machine_id: int,
+        machine_name: str,
+        machine_type: int,
+        machine_hours: float = 0,
+    ) -&gt; None:
+        &#34;&#34;&#34;Add a Machine to the database.
+
+        Args:
+            machine_id (int): id of the Machine
+            machine_name (str): name of the Machine
+            machine_type (int): type of the Machine
+            machine_hours (float, optional): Hours the Machine has been used. Defaults to 0.
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+
+        m = Machine(machine_id, machine_name, machine_type, machine_hours=machine_hours)
+
+        try:
+            collection.insert_one(m.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Machine&#34;, machine_id)
+
+    def getMachine(self, machine_id: int) -&gt; Machine:
+        &#34;&#34;&#34;Return Machine by its id.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+
+        result = collection.find_one(
+            {&#34;machine_id&#34;: machine_id}, projection={&#34;_id&#34;: 0, &#34;machine_id&#34;: 1}
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        for m in self.listMachines():
+            if m.machine_id == result[&#34;machine_id&#34;]:
+                return m
+
+    def removeMachine(self, machine_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a Machine from the database.
+
+        Args:
+            machine_id (int): id of the Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        collection.delete_one({&#34;machine_id&#34;: machine_id})
+
+    def listMachines(self) -&gt; list[Machine]:
+        &#34;&#34;&#34;List all the machines in the database.
+
+        Returns:
+            list[Machine]
+        &#34;&#34;&#34;
+        return [Machine.from_dict(m) for m in self._queryCollection(&#34;machines&#34;)]
+
+    def getMachineHours(self, machine_id: int) -&gt; float:
+        &#34;&#34;&#34;Get the Machine hours of a certain Machine according to its id.
+
+        Args:
+            machine_id (int): the id of the Machine
+
+        Returns:
+            float: Machine hours
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        return result[&#34;hours_used&#34;]
+
+    def setMachinesHours(self, machine_id: int, machine_hours: float) -&gt; None:
+        &#34;&#34;&#34;Set the Machine hours of a particular Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            machine_hours (float): hours the Machine has run
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;hours_used&#34;: machine_hours}}
+        )
+
+    def getMachineMachineType(self, machine_id: int) -&gt; int:
+        &#34;&#34;&#34;Get the type of the Machine according to its id.
+
+        Args:
+            machine_id (int): Machine id
+
+        Returns:
+            int: MachineType id
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        return result[&#34;machine_type&#34;]
+
+    def setMachineMachineType(self, machine_id: int, machine_type: int) -&gt; None:
+        &#34;&#34;&#34;Set the type of a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            machine_type (int): MachineType id
+        &#34;&#34;&#34;
+        if machine_type not in [t.type_id for t in self.listMachineTypes()]:
+            raise InvalidQueryValueException(&#34;MachineType id&#34;, machine_type)
+
+        collection = self._db[&#34;machines&#34;]
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_type&#34;: machine_type}}
+        )
+
+    def getMachineName(self, machine_id: int) -&gt; str:
+        &#34;&#34;&#34;Return the name of a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            str: name of the Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        return result[&#34;machine_name&#34;]
+
+    def setMachineName(self, machine_id: int, new_machine_name: str) -&gt; None:
+        &#34;&#34;&#34;Set a new name for a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            new_machine_name (str): new name of the Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_name&#34;: new_machine_name}}
+        )
+
+    def addMachineMaintenance(self, machine_id: int, maintenance_id: int) -&gt; None:
+        &#34;&#34;&#34;Add a Maintenance for a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            maintenance_id (int): id of the Maintenance
+        &#34;&#34;&#34;
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        if result[&#34;maintenances&#34;] is None:
+            collection.update_one(
+                {&#34;machine_id&#34;: machine_id},
+                {&#34;$set&#34;: {&#34;maintenances&#34;: [maintenance_id]}},
+            )
+        else:
+            collection.update_one(
+                {&#34;machine_id&#34;: machine_id},
+                {&#34;$push&#34;: {&#34;maintenances&#34;: maintenance_id}},
+            )
+
+    def getMachineMaintenances(self, machine_id: int) -&gt; list[Maintenance]:
+        &#34;&#34;&#34;Get Maintenances for a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            list[Maintenance]: list of Maintenances
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        if not result[&#34;maintenances&#34;]:
+            return []
+
+        return [
+            m
+            for m in self.listMaintenances()
+            if m.maintenance_id in result[&#34;maintenances&#34;]
+        ]
+
+    def removeMachineMaintenance(self, machine_id: int, maintenance_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a Maintenance from a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            maintenance_id (int): id of the Maintenances
+        &#34;&#34;&#34;
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        if result[&#34;maintenances&#34;] is None:
+            raise InvalidQueryValueException(&#34;Machine&#34;, &#34;maintenances&#34;)
+        else:
+            collection.update_one(
+                {&#34;machine_id&#34;: machine_id},
+                {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
+            )
+
+    def addMaintenance(
+        self, hours_between: float, description: str = None, maintenance_id: int = None
+    ) -&gt; int:
+        &#34;&#34;&#34;Add a Maintenance to database and return its IDS.
+
+        Args:
+            hours_between (float): hours between consecutive interventions
+            description (str, optional): Description of the Maintenance. Defaults to None.
+            maintenance_id (int, optional): id of the Maintenance. Automatically assigned if \
+                 not passed.
+
+        Returns:
+            int: id of the Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+
+        if maintenance_id is None:
+            if collection.count_documents({}) == 0:
+                maintenance_id = 0
+            else:
+                # find the highest User id and add 1
+                last = list(
+                    collection.find({}).sort(&#34;maintenance_id&#34;, DESCENDING).limit(1)
+                )[0]
+                maintenance_id = last[&#34;maintenance_id&#34;] + 1
+
+        m = Maintenance(
+            maintenance_id=maintenance_id,
+            hours_between=hours_between,
+            description=description,
+        )
+
+        try:
+            collection.insert_one(m.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        return maintenance_id
+
+    def getMaintenance(self, maintenance_id: int) -&gt; Maintenance:
+        &#34;&#34;&#34;Return Maintenance by its id.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+
+        Returns:
+            Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+
+        result = collection.find_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+            projection={&#34;_id&#34;: 0, &#34;maintenance_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        for m in self.listMaintenances():
+            if m.maintenance_id == result[&#34;maintenance_id&#34;]:
+                return m
+
+    def removeMaintenance(self, maintenance_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a maintenance according to it id.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        collection.delete_one({&#34;maintenance_id&#34;: maintenance_id})
+
+    def getMaintenanceDescription(self, maintenance_id: int) -&gt; str:
+        &#34;&#34;&#34;Get a Maintenance description according to its id.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+
+        Returns:
+            str: description of the Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        return result[&#34;description&#34;]
+
+    def setMaintenanceDescription(
+        self, maintenance_id: int, new_maintenance_description: str
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the description for a Maintenance.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+            new_maintenance_description (str): new Maintenance description
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        collection.update_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+            {&#34;$set&#34;: {&#34;description&#34;: new_maintenance_description}},
+        )
+
+    def getMaintenanceHoursBetween(self, maintenance_id: int) -&gt; float:
+        &#34;&#34;&#34;Get hours between a Maintenance.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+
+        Returns:
+            float: hours between a Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        return result[&#34;hours_between&#34;]
+
+    def setMaintenanceHoursBetween(
+        self, maintenance_id: int, new_hours_between: float
+    ) -&gt; None:
+        &#34;&#34;&#34;Set hours between Maintenances.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+            new_hours_between (float): hours between Maintenances
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        collection.update_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+            {&#34;$set&#34;: {&#34;hours_between&#34;: new_hours_between}},
+        )
+
+    def listMaintenances(self) -&gt; list[Maintenance]:
+        &#34;&#34;&#34;List all Maintenances from the database.
+
+        Returns:
+            list[Maintenance]: list of Maintenances
+        &#34;&#34;&#34;
+        return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="database.Database"><code class="flex name class">
+<span>class <span class="ident">Database</span></span>
+<span>(</span><span>settings_path='settings.toml')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class handling the connection from and to the database.</p>
+<p>Create instance of Database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>settings_path</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>TOML file settings. Defaults to "settings.toml".</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Database:
+    &#34;&#34;&#34;Class handling the connection from and to the database.&#34;&#34;&#34;
+
+    def __init__(self, settings_path=&#34;settings.toml&#34;) -&gt; None:
+        &#34;&#34;&#34;Create instance of Database.
+
+        Args:
+            settings_path (str, optional): TOML file settings. Defaults to &#34;settings.toml&#34;.
+        &#34;&#34;&#34;
+        self._settings_path = settings_path
+
+        self._client = None
+        self._db = None
+
+        # dict of collections and its relative unique index
+        self._collections = {
+            &#34;roles&#34;: &#34;role_id&#34;,
+            &#34;machine_types&#34;: &#34;type_id&#34;,
+            &#34;users&#34;: &#34;user_id&#34;,
+            &#34;machines&#34;: &#34;machine_id&#34;,
+            &#34;maintenances&#34;: &#34;maintenance_id&#34;,
+        }
+
+        self._loadSettings()
+        self._connect()
+        self._initCollections()
+
+    def _loadSettings(self) -&gt; None:
+        &#34;&#34;&#34;Load settings from TOML file.&#34;&#34;&#34;
+        self._settings = toml.load(self._settings_path)
+        self._url = self._settings[&#34;database&#34;][&#34;url&#34;]
+        self._name = self._settings[&#34;database&#34;][&#34;name&#34;]
+
+    def _connect(self) -&gt; None:
+        &#34;&#34;&#34;Connect to MongoDB server.&#34;&#34;&#34;
+        self._client = MongoClient(self._url)
+        self._db = self._client[self._name]
+
+    def _initCollections(self) -&gt; None:
+        &#34;&#34;&#34;Initialize the collections in the database.&#34;&#34;&#34;
+        collections = self._db.list_collection_names()
+
+        for c, i in self._collections.items():
+            if c not in collections:
+                self._db[c].create_index(i, unique=True)
+
+    def _queryCollection(self, collection_name: str) -&gt; list[dict]:
+        &#34;&#34;&#34;Query a collection and return the dict without the MongoDB mandatory _id.
+
+        Args:
+            collection_name (str): name of the collection
+
+        Returns:
+            list[dict]: list of dicts as returned from MongoDB
+        &#34;&#34;&#34;
+        collection = self._db[collection_name]
+        return list(collection.find(projection={&#34;_id&#34;: 0}))
+
+    def dropDatabase(self) -&gt; None:
+        &#34;&#34;&#34;Drop all colletions in database. Needless to say that this is pretty dangerous.&#34;&#34;&#34;
+        for c in self._db.list_collection_names():
+            self._db.drop_collection(c)
+
+    def addRole(self, role_id: int, role_name: str) -&gt; None:
+        &#34;&#34;&#34;Add a Role to the database.
+
+        Args:
+            role_id (int): id of the Role
+            role_name (str): name of the Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;roles&#34;]
+        r = Role(role_id, role_name)
+
+        try:
+            collection.insert_one(r.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Role&#34;, role_id)
+
+    def getRole(self, role_id: int) -&gt; Role:
+        &#34;&#34;&#34;Return Role by its id.
+
+        Args:
+            role_id (int): id of the Role
+
+        Returns:
+            Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;roles&#34;]
+
+        result = collection.find_one(
+            {&#34;role_id&#34;: role_id}, projection={&#34;_id&#34;: 0, &#34;role_id&#34;: 1}
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Role id&#34;, role_id)
+
+        for r in self.listRoles():
+            if r.role_id == result[&#34;role_id&#34;]:
+                return r
+
+    def editRoleName(self, role_id: int, new_role_name: str) -&gt; None:
+        &#34;&#34;&#34;Change the name of a Role.
+
+        Args:
+            role_id (int): id of the Role
+            new_role_name (str): new name of the Role
+        &#34;&#34;&#34;
+        r = Role(role_id, new_role_name)
+        collection = self._db[&#34;roles&#34;]
+        collection.update_one(
+            {&#34;role_id&#34;: role_id}, {&#34;$set&#34;: {&#34;role_name&#34;: r.role_name}}
+        )
+
+    def removeRole(self, role_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a Role from the database.
+
+        Args:
+            role_id (int): id of the Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;roles&#34;]
+        collection.delete_one({&#34;role_id&#34;: role_id})
+
+    def listRoles(self) -&gt; list[Role]:
+        &#34;&#34;&#34;List all Roles in the database.
+
+        Returns:
+            list[Role]: list of all Roles
+        &#34;&#34;&#34;
+        return [Role.from_dict(r) for r in self._queryCollection(&#34;roles&#34;)]
+
+    def addMachineType(self, type_id: int, type_name: str) -&gt; None:
+        &#34;&#34;&#34;Add a MachineType to the database.
+
+        Args:
+            type_id (int): id of the MachineType
+            type_name (str): name of the MachineType
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machine_types&#34;]
+        t = MachineType(type_id, type_name)
+
+        try:
+            collection.insert_one(t.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Type&#34;, type_id)
+
+    def getMachineType(self, type_id: int) -&gt; MachineType:
+        &#34;&#34;&#34;Return MachineType by it id.
+
+        Args:
+            type_id (int): id of the MachineType
+
+        Returns:
+            MachineType
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machine_types&#34;]
+
+        result = collection.find_one(
+            {&#34;type_id&#34;: type_id}, projection={&#34;_id&#34;: 0, &#34;type_id&#34;: 1}
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;MachineType id&#34;, type_id)
+
+        for t in self.listMachineTypes():
+            if t.type_id == result[&#34;type_id&#34;]:
+                return t
+
+    def editMachineTypeName(self, type_id: int, new_type_name: str) -&gt; None:
+        &#34;&#34;&#34;Change the name of a MachineType.
+
+        Args:
+            type_id (int): id of the MachineType
+            new_type_name (str): new name of the type
+        &#34;&#34;&#34;
+        t = MachineType(type_id, new_type_name)
+        collection = self._db[&#34;machine_types&#34;]
+        collection.update_one(
+            {&#34;type_id&#34;: type_id}, {&#34;$set&#34;: {&#34;type_name&#34;: t.type_name}}
+        )
+
+    def removeMachineType(self, type_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a MachineType from the database.
+
+        Args:
+            type_id (int): id of the MachineType
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machine_types&#34;]
+        collection.delete_one({&#34;type_id&#34;: type_id})
+
+    def listMachineTypes(self) -&gt; list[MachineType]:
+        &#34;&#34;&#34;List all Machine types in the database.
+
+        Returns:
+            list[MachineType]: list of all Machine types
+        &#34;&#34;&#34;
+        return [
+            MachineType.from_dict(t) for t in self._queryCollection(&#34;machine_types&#34;)
+        ]
+
+    def addUser(
+        self,
+        name: str,
+        surname: str,
+        user_id: int = None,
+        role_id: int = None,
+        card_UUID: str = None,
+    ) -&gt; int:
+        &#34;&#34;&#34;Add a User to the database.
+
+        Args:
+            name (str): Name of the User
+            surname (str): Surname of the User
+            user_id (int, optional): id of the User, optional. Will be assigned automatically.
+            role_id (int, optional): id of the Role.
+            card_UUID (str, optional): UUID of the RFID card.
+
+        Returns:
+            int: id of the User
+        &#34;&#34;&#34;
+        if role_id is not None and all(
+            r.role_id != role_id for r in self.listMachines()
+        ):
+            raise InvalidIdException(&#34;Role id&#34;, role_id)
+
+        collection = self._db[&#34;users&#34;]
+
+        if user_id is None:
+            if collection.count_documents({}) == 0:
+                user_id = 0
+            else:
+                # find the highest User id and add 1
+                last = list(collection.find({}).sort(&#34;user_id&#34;, DESCENDING).limit(1))[0]
+                user_id = last[&#34;user_id&#34;] + 1
+
+        u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
+
+        try:
+            collection.insert_one(u.serialize())
+            return user_id
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;User&#34;, user_id)
+
+    def listUsers(self) -&gt; list[User]:
+        &#34;&#34;&#34;Return all User in database.
+
+        Returns:
+            list[User]: list of users
+        &#34;&#34;&#34;
+        return [User.from_dict(u) for u in self._queryCollection(&#34;users&#34;)]
+
+    def getUser(
+        self, user_id: int = None, user_name: str = None, user_surname: str = None
+    ) -&gt; User:
+        &#34;&#34;&#34;Return a User from its user_id or its combination of name and surname.
+
+        Args:
+            user_id (int, optional): id of the User. Not necessary if name and surnames are provided
+            user_name (str, optional): name of the User. Must be passed along the surname. \
+            Not necessary if id is provided.
+            user_surname (str, optional): surname of the User. Must be passed along the name. \
+            Not necessary if id is provided.
+
+        Returns:
+            User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        result = None
+
+        if user_name and user_surname:
+            result = collection.find_one(
+                {&#34;name&#34;: user_name, &#34;surname&#34;: user_surname}, projection={&#34;_id&#34;: 0}
+            )
+        elif user_id is not None:
+            result = collection.find_one({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;User id&#34;, user_id)
+
+        return User.from_dict(result)
+
+        return None
+
+    def setUserRole(
+        self,
+        user_id: int,
+        role_id: int,
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the Role of a User.
+
+        Args:
+            user_id (int): id of the User
+            role_id (int): id of the Role
+        &#34;&#34;&#34;
+        if all(r.role_id != role_id for r in self.listMachines()):
+            raise InvalidIdException(&#34;Role id&#34;, role_id)
+
+        collection = self._db[&#34;users&#34;]
+        collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;role_id&#34;: role_id}})
+
+    def getUserRole(self, user_id: int) -&gt; Role:
+        &#34;&#34;&#34;Return the Role of a User.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+
+        result = collection.find_one(
+            {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;role_id&#34;: 1}
+        )
+
+        if result is None:
+            return None
+
+        for r in self.listMachines():
+            if r.role_id == result[&#34;role_id&#34;]:
+                return r
+
+    def setUserId(
+        self,
+        user_id: int,
+        new_id: int,
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the id of a User.
+
+        Args:
+            user_id (int): id of the User
+            new_id (int): new id of the User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;user_id&#34;: new_id}})
+
+    def getUserId(self, user_name: str = None, user_surname: str = None) -&gt; int:
+        &#34;&#34;&#34;Get a User id from its name and surname.
+
+        Args:
+            user_name (str): Name of the User.
+            user_surname (str): Surname of the User
+
+        Returns:
+            int: User id
+        &#34;&#34;&#34;
+        if user_name is None or user_surname is None:
+            raise MissingQueryValueException(&#34;Name and Surname&#34;, None)
+
+        user = self.getUser(user_name=user_name, user_surname=user_surname)
+
+        if user:
+            return user.user_id
+
+        return None
+
+    def setUserAuthorization(
+        self,
+        user_id: int,
+        authorization_ids: list[int],
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the authorization for an User.
+
+        Args:
+            user_id (int): id of the User
+            authorization_ids (list[int]): Machine types that the User is authorized to use
+        &#34;&#34;&#34;
+        if not isinstance(authorization_ids, list):
+            raise InvalidQueryValueException(&#34;Authorization ids&#34;, authorization_ids)
+
+        machine_types = [m.type_id for m in self.listMachineTypes()]
+        for i in authorization_ids:
+            if not isinstance(i, int):
+                raise InvalidQueryValueException(&#34;Authorization id&#34;, i)
+
+            if i not in machine_types:
+                raise InvalidIdException(&#34;MachineType&#34;, i)
+
+        collection = self._db[&#34;users&#34;]
+        collection.update_one(
+            {&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;authorization_ids&#34;: authorization_ids}}
+        )
+
+    def getUserAuthorization(self, user_id: int) -&gt; list[MachineType]:
+        &#34;&#34;&#34;Return the authorization of a User.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            list[MachineType]: list of Machine types the User is authorized to use
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+
+        result = collection.find_one(
+            {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;authorization_ids&#34;: 1}
+        )
+
+        if result is None:
+            return None
+
+        authorizations = []
+        for t in self.listMachineTypes():
+            if t.type_id in result[&#34;authorization_ids&#34;]:
+                authorizations.append(t)
+
+        return authorizations
+
+    def setUserCardUUID(
+        self,
+        user_id: int,
+        card_UUID: str,
+    ):
+        &#34;&#34;&#34;Set the UUID of the RFID card for a User.
+
+        Args:
+            user_id (int): id of the User
+            card_UUID (str): UUID of the RFID card
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;card_UUID&#34;: card_UUID}})
+
+    def getUserCardUUID(self, user_id: int) -&gt; str:
+        &#34;&#34;&#34;Get the UUID of the card of a User according to its id.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            str: UUID of the RFID card
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+
+        result = collection.find_one(
+            {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;card_UUID&#34;: 1}
+        )
+
+        if result is None:
+            return None
+
+        return result[&#34;card_UUID&#34;]
+
+    def addMachine(
+        self,
+        machine_id: int,
+        machine_name: str,
+        machine_type: int,
+        machine_hours: float = 0,
+    ) -&gt; None:
+        &#34;&#34;&#34;Add a Machine to the database.
+
+        Args:
+            machine_id (int): id of the Machine
+            machine_name (str): name of the Machine
+            machine_type (int): type of the Machine
+            machine_hours (float, optional): Hours the Machine has been used. Defaults to 0.
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+
+        m = Machine(machine_id, machine_name, machine_type, machine_hours=machine_hours)
+
+        try:
+            collection.insert_one(m.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Machine&#34;, machine_id)
+
+    def getMachine(self, machine_id: int) -&gt; Machine:
+        &#34;&#34;&#34;Return Machine by its id.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+
+        result = collection.find_one(
+            {&#34;machine_id&#34;: machine_id}, projection={&#34;_id&#34;: 0, &#34;machine_id&#34;: 1}
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        for m in self.listMachines():
+            if m.machine_id == result[&#34;machine_id&#34;]:
+                return m
+
+    def removeMachine(self, machine_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a Machine from the database.
+
+        Args:
+            machine_id (int): id of the Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        collection.delete_one({&#34;machine_id&#34;: machine_id})
+
+    def listMachines(self) -&gt; list[Machine]:
+        &#34;&#34;&#34;List all the machines in the database.
+
+        Returns:
+            list[Machine]
+        &#34;&#34;&#34;
+        return [Machine.from_dict(m) for m in self._queryCollection(&#34;machines&#34;)]
+
+    def getMachineHours(self, machine_id: int) -&gt; float:
+        &#34;&#34;&#34;Get the Machine hours of a certain Machine according to its id.
+
+        Args:
+            machine_id (int): the id of the Machine
+
+        Returns:
+            float: Machine hours
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        return result[&#34;hours_used&#34;]
+
+    def setMachinesHours(self, machine_id: int, machine_hours: float) -&gt; None:
+        &#34;&#34;&#34;Set the Machine hours of a particular Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            machine_hours (float): hours the Machine has run
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;hours_used&#34;: machine_hours}}
+        )
+
+    def getMachineMachineType(self, machine_id: int) -&gt; int:
+        &#34;&#34;&#34;Get the type of the Machine according to its id.
+
+        Args:
+            machine_id (int): Machine id
+
+        Returns:
+            int: MachineType id
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        return result[&#34;machine_type&#34;]
+
+    def setMachineMachineType(self, machine_id: int, machine_type: int) -&gt; None:
+        &#34;&#34;&#34;Set the type of a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            machine_type (int): MachineType id
+        &#34;&#34;&#34;
+        if machine_type not in [t.type_id for t in self.listMachineTypes()]:
+            raise InvalidQueryValueException(&#34;MachineType id&#34;, machine_type)
+
+        collection = self._db[&#34;machines&#34;]
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_type&#34;: machine_type}}
+        )
+
+    def getMachineName(self, machine_id: int) -&gt; str:
+        &#34;&#34;&#34;Return the name of a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            str: name of the Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        return result[&#34;machine_name&#34;]
+
+    def setMachineName(self, machine_id: int, new_machine_name: str) -&gt; None:
+        &#34;&#34;&#34;Set a new name for a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            new_machine_name (str): new name of the Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_name&#34;: new_machine_name}}
+        )
+
+    def addMachineMaintenance(self, machine_id: int, maintenance_id: int) -&gt; None:
+        &#34;&#34;&#34;Add a Maintenance for a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            maintenance_id (int): id of the Maintenance
+        &#34;&#34;&#34;
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        if result[&#34;maintenances&#34;] is None:
+            collection.update_one(
+                {&#34;machine_id&#34;: machine_id},
+                {&#34;$set&#34;: {&#34;maintenances&#34;: [maintenance_id]}},
+            )
+        else:
+            collection.update_one(
+                {&#34;machine_id&#34;: machine_id},
+                {&#34;$push&#34;: {&#34;maintenances&#34;: maintenance_id}},
+            )
+
+    def getMachineMaintenances(self, machine_id: int) -&gt; list[Maintenance]:
+        &#34;&#34;&#34;Get Maintenances for a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            list[Maintenance]: list of Maintenances
+        &#34;&#34;&#34;
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        if not result[&#34;maintenances&#34;]:
+            return []
+
+        return [
+            m
+            for m in self.listMaintenances()
+            if m.maintenance_id in result[&#34;maintenances&#34;]
+        ]
+
+    def removeMachineMaintenance(self, machine_id: int, maintenance_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a Maintenance from a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            maintenance_id (int): id of the Maintenances
+        &#34;&#34;&#34;
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        collection = self._db[&#34;machines&#34;]
+        result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+        if result[&#34;maintenances&#34;] is None:
+            raise InvalidQueryValueException(&#34;Machine&#34;, &#34;maintenances&#34;)
+        else:
+            collection.update_one(
+                {&#34;machine_id&#34;: machine_id},
+                {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
+            )
+
+    def addMaintenance(
+        self, hours_between: float, description: str = None, maintenance_id: int = None
+    ) -&gt; int:
+        &#34;&#34;&#34;Add a Maintenance to database and return its IDS.
+
+        Args:
+            hours_between (float): hours between consecutive interventions
+            description (str, optional): Description of the Maintenance. Defaults to None.
+            maintenance_id (int, optional): id of the Maintenance. Automatically assigned if \
+                 not passed.
+
+        Returns:
+            int: id of the Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+
+        if maintenance_id is None:
+            if collection.count_documents({}) == 0:
+                maintenance_id = 0
+            else:
+                # find the highest User id and add 1
+                last = list(
+                    collection.find({}).sort(&#34;maintenance_id&#34;, DESCENDING).limit(1)
+                )[0]
+                maintenance_id = last[&#34;maintenance_id&#34;] + 1
+
+        m = Maintenance(
+            maintenance_id=maintenance_id,
+            hours_between=hours_between,
+            description=description,
+        )
+
+        try:
+            collection.insert_one(m.serialize())
+        except DuplicateKeyError:
+            raise DuplicatedIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        return maintenance_id
+
+    def getMaintenance(self, maintenance_id: int) -&gt; Maintenance:
+        &#34;&#34;&#34;Return Maintenance by its id.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+
+        Returns:
+            Role
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+
+        result = collection.find_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+            projection={&#34;_id&#34;: 0, &#34;maintenance_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        for m in self.listMaintenances():
+            if m.maintenance_id == result[&#34;maintenance_id&#34;]:
+                return m
+
+    def removeMaintenance(self, maintenance_id: int) -&gt; None:
+        &#34;&#34;&#34;Remove a maintenance according to it id.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        collection.delete_one({&#34;maintenance_id&#34;: maintenance_id})
+
+    def getMaintenanceDescription(self, maintenance_id: int) -&gt; str:
+        &#34;&#34;&#34;Get a Maintenance description according to its id.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+
+        Returns:
+            str: description of the Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        return result[&#34;description&#34;]
+
+    def setMaintenanceDescription(
+        self, maintenance_id: int, new_maintenance_description: str
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the description for a Maintenance.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+            new_maintenance_description (str): new Maintenance description
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        collection.update_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+            {&#34;$set&#34;: {&#34;description&#34;: new_maintenance_description}},
+        )
+
+    def getMaintenanceHoursBetween(self, maintenance_id: int) -&gt; float:
+        &#34;&#34;&#34;Get hours between a Maintenance.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+
+        Returns:
+            float: hours between a Maintenance
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+
+        if result is None:
+            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+        return result[&#34;hours_between&#34;]
+
+    def setMaintenanceHoursBetween(
+        self, maintenance_id: int, new_hours_between: float
+    ) -&gt; None:
+        &#34;&#34;&#34;Set hours between Maintenances.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+            new_hours_between (float): hours between Maintenances
+        &#34;&#34;&#34;
+        collection = self._db[&#34;maintenances&#34;]
+        collection.update_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+            {&#34;$set&#34;: {&#34;hours_between&#34;: new_hours_between}},
+        )
+
+    def listMaintenances(self) -&gt; list[Maintenance]:
+        &#34;&#34;&#34;List all Maintenances from the database.
+
+        Returns:
+            list[Maintenance]: list of Maintenances
+        &#34;&#34;&#34;
+        return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="database.Database.addMachine"><code class="name flex">
+<span>def <span class="ident">addMachine</span></span>(<span>self, machine_id: int, machine_name: str, machine_type: int, machine_hours: float = 0) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Machine to the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>machine_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>name of the Machine</dd>
+<dt><strong><code>machine_type</code></strong> :&ensp;<code>int</code></dt>
+<dd>type of the Machine</dd>
+<dt><strong><code>machine_hours</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Hours the Machine has been used. Defaults to 0.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addMachine(
+    self,
+    machine_id: int,
+    machine_name: str,
+    machine_type: int,
+    machine_hours: float = 0,
+) -&gt; None:
+    &#34;&#34;&#34;Add a Machine to the database.
+
+    Args:
+        machine_id (int): id of the Machine
+        machine_name (str): name of the Machine
+        machine_type (int): type of the Machine
+        machine_hours (float, optional): Hours the Machine has been used. Defaults to 0.
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+
+    m = Machine(machine_id, machine_name, machine_type, machine_hours=machine_hours)
+
+    try:
+        collection.insert_one(m.serialize())
+    except DuplicateKeyError:
+        raise DuplicatedIdException(&#34;Machine&#34;, machine_id)</code></pre>
+</details>
+</dd>
+<dt id="database.Database.addMachineMaintenance"><code class="name flex">
+<span>def <span class="ident">addMachineMaintenance</span></span>(<span>self, machine_id: int, maintenance_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Maintenance for a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addMachineMaintenance(self, machine_id: int, maintenance_id: int) -&gt; None:
+    &#34;&#34;&#34;Add a Maintenance for a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+        maintenance_id (int): id of the Maintenance
+    &#34;&#34;&#34;
+    if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+    collection = self._db[&#34;machines&#34;]
+    result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    if result[&#34;maintenances&#34;] is None:
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id},
+            {&#34;$set&#34;: {&#34;maintenances&#34;: [maintenance_id]}},
+        )
+    else:
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id},
+            {&#34;$push&#34;: {&#34;maintenances&#34;: maintenance_id}},
+        )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.addMachineType"><code class="name flex">
+<span>def <span class="ident">addMachineType</span></span>(<span>self, type_id: int, type_name: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a MachineType to the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>type_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the MachineType</dd>
+<dt><strong><code>type_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>name of the MachineType</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addMachineType(self, type_id: int, type_name: str) -&gt; None:
+    &#34;&#34;&#34;Add a MachineType to the database.
+
+    Args:
+        type_id (int): id of the MachineType
+        type_name (str): name of the MachineType
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machine_types&#34;]
+    t = MachineType(type_id, type_name)
+
+    try:
+        collection.insert_one(t.serialize())
+    except DuplicateKeyError:
+        raise DuplicatedIdException(&#34;Type&#34;, type_id)</code></pre>
+</details>
+</dd>
+<dt id="database.Database.addMaintenance"><code class="name flex">
+<span>def <span class="ident">addMaintenance</span></span>(<span>self, hours_between: float, description: str = None, maintenance_id: int = None) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Maintenance to database and return its IDS.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>hours_between</code></strong> :&ensp;<code>float</code></dt>
+<dd>hours between consecutive interventions</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Description of the Maintenance. Defaults to None.</dd>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of the Maintenance. Automatically assigned if
+not passed.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>id of the Maintenance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addMaintenance(
+    self, hours_between: float, description: str = None, maintenance_id: int = None
+) -&gt; int:
+    &#34;&#34;&#34;Add a Maintenance to database and return its IDS.
+
+    Args:
+        hours_between (float): hours between consecutive interventions
+        description (str, optional): Description of the Maintenance. Defaults to None.
+        maintenance_id (int, optional): id of the Maintenance. Automatically assigned if \
+             not passed.
+
+    Returns:
+        int: id of the Maintenance
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+
+    if maintenance_id is None:
+        if collection.count_documents({}) == 0:
+            maintenance_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(
+                collection.find({}).sort(&#34;maintenance_id&#34;, DESCENDING).limit(1)
+            )[0]
+            maintenance_id = last[&#34;maintenance_id&#34;] + 1
+
+    m = Maintenance(
+        maintenance_id=maintenance_id,
+        hours_between=hours_between,
+        description=description,
+    )
+
+    try:
+        collection.insert_one(m.serialize())
+    except DuplicateKeyError:
+        raise DuplicatedIdException(&#34;Maintenance&#34;, maintenance_id)
+
+    return maintenance_id</code></pre>
+</details>
+</dd>
+<dt id="database.Database.addRole"><code class="name flex">
+<span>def <span class="ident">addRole</span></span>(<span>self, role_id: int, role_name: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Role to the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Role</dd>
+<dt><strong><code>role_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>name of the Role</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addRole(self, role_id: int, role_name: str) -&gt; None:
+    &#34;&#34;&#34;Add a Role to the database.
+
+    Args:
+        role_id (int): id of the Role
+        role_name (str): name of the Role
+    &#34;&#34;&#34;
+    collection = self._db[&#34;roles&#34;]
+    r = Role(role_id, role_name)
+
+    try:
+        collection.insert_one(r.serialize())
+    except DuplicateKeyError:
+        raise DuplicatedIdException(&#34;Role&#34;, role_id)</code></pre>
+</details>
+</dd>
+<dt id="database.Database.addUser"><code class="name flex">
+<span>def <span class="ident">addUser</span></span>(<span>self, name: str, surname: str, user_id: int = None, role_id: int = None, card_UUID: str = None) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a User to the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the User</dd>
+<dt><strong><code>surname</code></strong> :&ensp;<code>str</code></dt>
+<dd>Surname of the User</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of the User, optional. Will be assigned automatically.</dd>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of the Role.</dd>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>UUID of the RFID card.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>id of the User</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addUser(
+    self,
+    name: str,
+    surname: str,
+    user_id: int = None,
+    role_id: int = None,
+    card_UUID: str = None,
+) -&gt; int:
+    &#34;&#34;&#34;Add a User to the database.
+
+    Args:
+        name (str): Name of the User
+        surname (str): Surname of the User
+        user_id (int, optional): id of the User, optional. Will be assigned automatically.
+        role_id (int, optional): id of the Role.
+        card_UUID (str, optional): UUID of the RFID card.
+
+    Returns:
+        int: id of the User
+    &#34;&#34;&#34;
+    if role_id is not None and all(
+        r.role_id != role_id for r in self.listMachines()
+    ):
+        raise InvalidIdException(&#34;Role id&#34;, role_id)
+
+    collection = self._db[&#34;users&#34;]
+
+    if user_id is None:
+        if collection.count_documents({}) == 0:
+            user_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(collection.find({}).sort(&#34;user_id&#34;, DESCENDING).limit(1))[0]
+            user_id = last[&#34;user_id&#34;] + 1
+
+    u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
+
+    try:
+        collection.insert_one(u.serialize())
+        return user_id
+    except DuplicateKeyError:
+        raise DuplicatedIdException(&#34;User&#34;, user_id)</code></pre>
+</details>
+</dd>
+<dt id="database.Database.dropDatabase"><code class="name flex">
+<span>def <span class="ident">dropDatabase</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Drop all colletions in database. Needless to say that this is pretty dangerous.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dropDatabase(self) -&gt; None:
+    &#34;&#34;&#34;Drop all colletions in database. Needless to say that this is pretty dangerous.&#34;&#34;&#34;
+    for c in self._db.list_collection_names():
+        self._db.drop_collection(c)</code></pre>
+</details>
+</dd>
+<dt id="database.Database.editMachineTypeName"><code class="name flex">
+<span>def <span class="ident">editMachineTypeName</span></span>(<span>self, type_id: int, new_type_name: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Change the name of a MachineType.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>type_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the MachineType</dd>
+<dt><strong><code>new_type_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>new name of the type</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def editMachineTypeName(self, type_id: int, new_type_name: str) -&gt; None:
+    &#34;&#34;&#34;Change the name of a MachineType.
+
+    Args:
+        type_id (int): id of the MachineType
+        new_type_name (str): new name of the type
+    &#34;&#34;&#34;
+    t = MachineType(type_id, new_type_name)
+    collection = self._db[&#34;machine_types&#34;]
+    collection.update_one(
+        {&#34;type_id&#34;: type_id}, {&#34;$set&#34;: {&#34;type_name&#34;: t.type_name}}
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.editRoleName"><code class="name flex">
+<span>def <span class="ident">editRoleName</span></span>(<span>self, role_id: int, new_role_name: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Change the name of a Role.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Role</dd>
+<dt><strong><code>new_role_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>new name of the Role</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def editRoleName(self, role_id: int, new_role_name: str) -&gt; None:
+    &#34;&#34;&#34;Change the name of a Role.
+
+    Args:
+        role_id (int): id of the Role
+        new_role_name (str): new name of the Role
+    &#34;&#34;&#34;
+    r = Role(role_id, new_role_name)
+    collection = self._db[&#34;roles&#34;]
+    collection.update_one(
+        {&#34;role_id&#34;: role_id}, {&#34;$set&#34;: {&#34;role_name&#34;: r.role_name}}
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMachine"><code class="name flex">
+<span>def <span class="ident">getMachine</span></span>(<span>self, machine_id: int) ‑> <a title="entities.Machine" href="entities.html#entities.Machine">Machine</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return Machine by its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Machine</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMachine(self, machine_id: int) -&gt; Machine:
+    &#34;&#34;&#34;Return Machine by its id.
+
+    Args:
+        machine_id (int): id of the Machine
+
+    Returns:
+        Machine
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+
+    result = collection.find_one(
+        {&#34;machine_id&#34;: machine_id}, projection={&#34;_id&#34;: 0, &#34;machine_id&#34;: 1}
+    )
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    for m in self.listMachines():
+        if m.machine_id == result[&#34;machine_id&#34;]:
+            return m</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMachineHours"><code class="name flex">
+<span>def <span class="ident">getMachineHours</span></span>(<span>self, machine_id: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the Machine hours of a certain Machine according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>the id of the Machine</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>Machine hours</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMachineHours(self, machine_id: int) -&gt; float:
+    &#34;&#34;&#34;Get the Machine hours of a certain Machine according to its id.
+
+    Args:
+        machine_id (int): the id of the Machine
+
+    Returns:
+        float: Machine hours
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    return result[&#34;hours_used&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMachineMachineType"><code class="name flex">
+<span>def <span class="ident">getMachineMachineType</span></span>(<span>self, machine_id: int) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the type of the Machine according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Machine id</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>MachineType id</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMachineMachineType(self, machine_id: int) -&gt; int:
+    &#34;&#34;&#34;Get the type of the Machine according to its id.
+
+    Args:
+        machine_id (int): Machine id
+
+    Returns:
+        int: MachineType id
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    return result[&#34;machine_type&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMachineMaintenances"><code class="name flex">
+<span>def <span class="ident">getMachineMaintenances</span></span>(<span>self, machine_id: int) ‑> list[<a title="entities.Maintenance" href="entities.html#entities.Maintenance">Maintenance</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Maintenances for a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Maintenance]</code></dt>
+<dd>list of Maintenances</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMachineMaintenances(self, machine_id: int) -&gt; list[Maintenance]:
+    &#34;&#34;&#34;Get Maintenances for a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+
+    Returns:
+        list[Maintenance]: list of Maintenances
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    if not result[&#34;maintenances&#34;]:
+        return []
+
+    return [
+        m
+        for m in self.listMaintenances()
+        if m.maintenance_id in result[&#34;maintenances&#34;]
+    ]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMachineName"><code class="name flex">
+<span>def <span class="ident">getMachineName</span></span>(<span>self, machine_id: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the name of a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>name of the Machine</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMachineName(self, machine_id: int) -&gt; str:
+    &#34;&#34;&#34;Return the name of a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+
+    Returns:
+        str: name of the Machine
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    return result[&#34;machine_name&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMachineType"><code class="name flex">
+<span>def <span class="ident">getMachineType</span></span>(<span>self, type_id: int) ‑> <a title="entities.MachineType" href="entities.html#entities.MachineType">MachineType</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return MachineType by it id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>type_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the MachineType</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>MachineType</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMachineType(self, type_id: int) -&gt; MachineType:
+    &#34;&#34;&#34;Return MachineType by it id.
+
+    Args:
+        type_id (int): id of the MachineType
+
+    Returns:
+        MachineType
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machine_types&#34;]
+
+    result = collection.find_one(
+        {&#34;type_id&#34;: type_id}, projection={&#34;_id&#34;: 0, &#34;type_id&#34;: 1}
+    )
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;MachineType id&#34;, type_id)
+
+    for t in self.listMachineTypes():
+        if t.type_id == result[&#34;type_id&#34;]:
+            return t</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMaintenance"><code class="name flex">
+<span>def <span class="ident">getMaintenance</span></span>(<span>self, maintenance_id: int) ‑> <a title="entities.Maintenance" href="entities.html#entities.Maintenance">Maintenance</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return Maintenance by its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Role</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMaintenance(self, maintenance_id: int) -&gt; Maintenance:
+    &#34;&#34;&#34;Return Maintenance by its id.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+
+    Returns:
+        Role
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+
+    result = collection.find_one(
+        {&#34;maintenance_id&#34;: maintenance_id},
+        projection={&#34;_id&#34;: 0, &#34;maintenance_id&#34;: 1},
+    )
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+    for m in self.listMaintenances():
+        if m.maintenance_id == result[&#34;maintenance_id&#34;]:
+            return m</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMaintenanceDescription"><code class="name flex">
+<span>def <span class="ident">getMaintenanceDescription</span></span>(<span>self, maintenance_id: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a Maintenance description according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>description of the Maintenance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMaintenanceDescription(self, maintenance_id: int) -&gt; str:
+    &#34;&#34;&#34;Get a Maintenance description according to its id.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+
+    Returns:
+        str: description of the Maintenance
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+    result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+    return result[&#34;description&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getMaintenanceHoursBetween"><code class="name flex">
+<span>def <span class="ident">getMaintenanceHoursBetween</span></span>(<span>self, maintenance_id: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get hours between a Maintenance.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>hours between a Maintenance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getMaintenanceHoursBetween(self, maintenance_id: int) -&gt; float:
+    &#34;&#34;&#34;Get hours between a Maintenance.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+
+    Returns:
+        float: hours between a Maintenance
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+    result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+    return result[&#34;hours_between&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getRole"><code class="name flex">
+<span>def <span class="ident">getRole</span></span>(<span>self, role_id: int) ‑> <a title="entities.Role" href="entities.html#entities.Role">Role</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return Role by its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Role</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Role</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getRole(self, role_id: int) -&gt; Role:
+    &#34;&#34;&#34;Return Role by its id.
+
+    Args:
+        role_id (int): id of the Role
+
+    Returns:
+        Role
+    &#34;&#34;&#34;
+    collection = self._db[&#34;roles&#34;]
+
+    result = collection.find_one(
+        {&#34;role_id&#34;: role_id}, projection={&#34;_id&#34;: 0, &#34;role_id&#34;: 1}
+    )
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Role id&#34;, role_id)
+
+    for r in self.listRoles():
+        if r.role_id == result[&#34;role_id&#34;]:
+            return r</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUser"><code class="name flex">
+<span>def <span class="ident">getUser</span></span>(<span>self, user_id: int = None, user_name: str = None, user_surname: str = None) ‑> <a title="entities.User" href="entities.html#entities.User">User</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a User from its user_id or its combination of name and surname.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of the User. Not necessary if name and surnames are provided</dd>
+<dt><strong><code>user_name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>name of the User. Must be passed along the surname.
+Not necessary if id is provided.</dd>
+<dt><strong><code>user_surname</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>surname of the User. Must be passed along the name.
+Not necessary if id is provided.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>User</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUser(
+    self, user_id: int = None, user_name: str = None, user_surname: str = None
+) -&gt; User:
+    &#34;&#34;&#34;Return a User from its user_id or its combination of name and surname.
+
+    Args:
+        user_id (int, optional): id of the User. Not necessary if name and surnames are provided
+        user_name (str, optional): name of the User. Must be passed along the surname. \
+        Not necessary if id is provided.
+        user_surname (str, optional): surname of the User. Must be passed along the name. \
+        Not necessary if id is provided.
+
+    Returns:
+        User
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+    result = None
+
+    if user_name and user_surname:
+        result = collection.find_one(
+            {&#34;name&#34;: user_name, &#34;surname&#34;: user_surname}, projection={&#34;_id&#34;: 0}
+        )
+    elif user_id is not None:
+        result = collection.find_one({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;User id&#34;, user_id)
+
+    return User.from_dict(result)
+
+    return None</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserAuthorization"><code class="name flex">
+<span>def <span class="ident">getUserAuthorization</span></span>(<span>self, user_id: int) ‑> list[<a title="entities.MachineType" href="entities.html#entities.MachineType">MachineType</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the authorization of a User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[MachineType]</code></dt>
+<dd>list of Machine types the User is authorized to use</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserAuthorization(self, user_id: int) -&gt; list[MachineType]:
+    &#34;&#34;&#34;Return the authorization of a User.
+
+    Args:
+        user_id (int): id of the User
+
+    Returns:
+        list[MachineType]: list of Machine types the User is authorized to use
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+
+    result = collection.find_one(
+        {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;authorization_ids&#34;: 1}
+    )
+
+    if result is None:
+        return None
+
+    authorizations = []
+    for t in self.listMachineTypes():
+        if t.type_id in result[&#34;authorization_ids&#34;]:
+            authorizations.append(t)
+
+    return authorizations</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserCardUUID"><code class="name flex">
+<span>def <span class="ident">getUserCardUUID</span></span>(<span>self, user_id: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the UUID of the card of a User according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>UUID of the RFID card</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserCardUUID(self, user_id: int) -&gt; str:
+    &#34;&#34;&#34;Get the UUID of the card of a User according to its id.
+
+    Args:
+        user_id (int): id of the User
+
+    Returns:
+        str: UUID of the RFID card
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+
+    result = collection.find_one(
+        {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;card_UUID&#34;: 1}
+    )
+
+    if result is None:
+        return None
+
+    return result[&#34;card_UUID&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserId"><code class="name flex">
+<span>def <span class="ident">getUserId</span></span>(<span>self, user_name: str = None, user_surname: str = None) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a User id from its name and surname.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the User.</dd>
+<dt><strong><code>user_surname</code></strong> :&ensp;<code>str</code></dt>
+<dd>Surname of the User</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>User id</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserId(self, user_name: str = None, user_surname: str = None) -&gt; int:
+    &#34;&#34;&#34;Get a User id from its name and surname.
+
+    Args:
+        user_name (str): Name of the User.
+        user_surname (str): Surname of the User
+
+    Returns:
+        int: User id
+    &#34;&#34;&#34;
+    if user_name is None or user_surname is None:
+        raise MissingQueryValueException(&#34;Name and Surname&#34;, None)
+
+    user = self.getUser(user_name=user_name, user_surname=user_surname)
+
+    if user:
+        return user.user_id
+
+    return None</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserRole"><code class="name flex">
+<span>def <span class="ident">getUserRole</span></span>(<span>self, user_id: int) ‑> <a title="entities.Role" href="entities.html#entities.Role">Role</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the Role of a User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Role</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserRole(self, user_id: int) -&gt; Role:
+    &#34;&#34;&#34;Return the Role of a User.
+
+    Args:
+        user_id (int): id of the User
+
+    Returns:
+        Role
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+
+    result = collection.find_one(
+        {&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0, &#34;role_id&#34;: 1}
+    )
+
+    if result is None:
+        return None
+
+    for r in self.listMachines():
+        if r.role_id == result[&#34;role_id&#34;]:
+            return r</code></pre>
+</details>
+</dd>
+<dt id="database.Database.listMachineTypes"><code class="name flex">
+<span>def <span class="ident">listMachineTypes</span></span>(<span>self) ‑> list[<a title="entities.MachineType" href="entities.html#entities.MachineType">MachineType</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all Machine types in the database.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[MachineType]</code></dt>
+<dd>list of all Machine types</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def listMachineTypes(self) -&gt; list[MachineType]:
+    &#34;&#34;&#34;List all Machine types in the database.
+
+    Returns:
+        list[MachineType]: list of all Machine types
+    &#34;&#34;&#34;
+    return [
+        MachineType.from_dict(t) for t in self._queryCollection(&#34;machine_types&#34;)
+    ]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.listMachines"><code class="name flex">
+<span>def <span class="ident">listMachines</span></span>(<span>self) ‑> list[<a title="entities.Machine" href="entities.html#entities.Machine">Machine</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all the machines in the database.</p>
+<h2 id="returns">Returns</h2>
+<p>list[Machine]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def listMachines(self) -&gt; list[Machine]:
+    &#34;&#34;&#34;List all the machines in the database.
+
+    Returns:
+        list[Machine]
+    &#34;&#34;&#34;
+    return [Machine.from_dict(m) for m in self._queryCollection(&#34;machines&#34;)]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.listMaintenances"><code class="name flex">
+<span>def <span class="ident">listMaintenances</span></span>(<span>self) ‑> list[<a title="entities.Maintenance" href="entities.html#entities.Maintenance">Maintenance</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all Maintenances from the database.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Maintenance]</code></dt>
+<dd>list of Maintenances</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def listMaintenances(self) -&gt; list[Maintenance]:
+    &#34;&#34;&#34;List all Maintenances from the database.
+
+    Returns:
+        list[Maintenance]: list of Maintenances
+    &#34;&#34;&#34;
+    return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.listRoles"><code class="name flex">
+<span>def <span class="ident">listRoles</span></span>(<span>self) ‑> list[<a title="entities.Role" href="entities.html#entities.Role">Role</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all Roles in the database.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Role]</code></dt>
+<dd>list of all Roles</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def listRoles(self) -&gt; list[Role]:
+    &#34;&#34;&#34;List all Roles in the database.
+
+    Returns:
+        list[Role]: list of all Roles
+    &#34;&#34;&#34;
+    return [Role.from_dict(r) for r in self._queryCollection(&#34;roles&#34;)]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.listUsers"><code class="name flex">
+<span>def <span class="ident">listUsers</span></span>(<span>self) ‑> list[<a title="entities.User" href="entities.html#entities.User">User</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return all User in database.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[User]</code></dt>
+<dd>list of users</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def listUsers(self) -&gt; list[User]:
+    &#34;&#34;&#34;Return all User in database.
+
+    Returns:
+        list[User]: list of users
+    &#34;&#34;&#34;
+    return [User.from_dict(u) for u in self._queryCollection(&#34;users&#34;)]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.removeMachine"><code class="name flex">
+<span>def <span class="ident">removeMachine</span></span>(<span>self, machine_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a Machine from the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removeMachine(self, machine_id: int) -&gt; None:
+    &#34;&#34;&#34;Remove a Machine from the database.
+
+    Args:
+        machine_id (int): id of the Machine
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    collection.delete_one({&#34;machine_id&#34;: machine_id})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.removeMachineMaintenance"><code class="name flex">
+<span>def <span class="ident">removeMachineMaintenance</span></span>(<span>self, machine_id: int, maintenance_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a Maintenance from a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenances</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removeMachineMaintenance(self, machine_id: int, maintenance_id: int) -&gt; None:
+    &#34;&#34;&#34;Remove a Maintenance from a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+        maintenance_id (int): id of the Maintenances
+    &#34;&#34;&#34;
+    if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+
+    collection = self._db[&#34;machines&#34;]
+    result = collection.find_one({&#34;machine_id&#34;: machine_id})
+
+    if result is None:
+        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+
+    if result[&#34;maintenances&#34;] is None:
+        raise InvalidQueryValueException(&#34;Machine&#34;, &#34;maintenances&#34;)
+    else:
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id},
+            {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
+        )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.removeMachineType"><code class="name flex">
+<span>def <span class="ident">removeMachineType</span></span>(<span>self, type_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a MachineType from the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>type_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the MachineType</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removeMachineType(self, type_id: int) -&gt; None:
+    &#34;&#34;&#34;Remove a MachineType from the database.
+
+    Args:
+        type_id (int): id of the MachineType
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machine_types&#34;]
+    collection.delete_one({&#34;type_id&#34;: type_id})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.removeMaintenance"><code class="name flex">
+<span>def <span class="ident">removeMaintenance</span></span>(<span>self, maintenance_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a maintenance according to it id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removeMaintenance(self, maintenance_id: int) -&gt; None:
+    &#34;&#34;&#34;Remove a maintenance according to it id.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+    collection.delete_one({&#34;maintenance_id&#34;: maintenance_id})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.removeRole"><code class="name flex">
+<span>def <span class="ident">removeRole</span></span>(<span>self, role_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a Role from the database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Role</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removeRole(self, role_id: int) -&gt; None:
+    &#34;&#34;&#34;Remove a Role from the database.
+
+    Args:
+        role_id (int): id of the Role
+    &#34;&#34;&#34;
+    collection = self._db[&#34;roles&#34;]
+    collection.delete_one({&#34;role_id&#34;: role_id})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setMachineMachineType"><code class="name flex">
+<span>def <span class="ident">setMachineMachineType</span></span>(<span>self, machine_id: int, machine_type: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the type of a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>machine_type</code></strong> :&ensp;<code>int</code></dt>
+<dd>MachineType id</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setMachineMachineType(self, machine_id: int, machine_type: int) -&gt; None:
+    &#34;&#34;&#34;Set the type of a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+        machine_type (int): MachineType id
+    &#34;&#34;&#34;
+    if machine_type not in [t.type_id for t in self.listMachineTypes()]:
+        raise InvalidQueryValueException(&#34;MachineType id&#34;, machine_type)
+
+    collection = self._db[&#34;machines&#34;]
+    collection.update_one(
+        {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_type&#34;: machine_type}}
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setMachineName"><code class="name flex">
+<span>def <span class="ident">setMachineName</span></span>(<span>self, machine_id: int, new_machine_name: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set a new name for a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>new_machine_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>new name of the Machine</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setMachineName(self, machine_id: int, new_machine_name: str) -&gt; None:
+    &#34;&#34;&#34;Set a new name for a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+        new_machine_name (str): new name of the Machine
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    collection.update_one(
+        {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_name&#34;: new_machine_name}}
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setMachinesHours"><code class="name flex">
+<span>def <span class="ident">setMachinesHours</span></span>(<span>self, machine_id: int, machine_hours: float) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the Machine hours of a particular Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>machine_hours</code></strong> :&ensp;<code>float</code></dt>
+<dd>hours the Machine has run</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setMachinesHours(self, machine_id: int, machine_hours: float) -&gt; None:
+    &#34;&#34;&#34;Set the Machine hours of a particular Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+        machine_hours (float): hours the Machine has run
+    &#34;&#34;&#34;
+    collection = self._db[&#34;machines&#34;]
+    collection.update_one(
+        {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;hours_used&#34;: machine_hours}}
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setMaintenanceDescription"><code class="name flex">
+<span>def <span class="ident">setMaintenanceDescription</span></span>(<span>self, maintenance_id: int, new_maintenance_description: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the description for a Maintenance.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+<dt><strong><code>new_maintenance_description</code></strong> :&ensp;<code>str</code></dt>
+<dd>new Maintenance description</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setMaintenanceDescription(
+    self, maintenance_id: int, new_maintenance_description: str
+) -&gt; None:
+    &#34;&#34;&#34;Set the description for a Maintenance.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+        new_maintenance_description (str): new Maintenance description
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+    collection.update_one(
+        {&#34;maintenance_id&#34;: maintenance_id},
+        {&#34;$set&#34;: {&#34;description&#34;: new_maintenance_description}},
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setMaintenanceHoursBetween"><code class="name flex">
+<span>def <span class="ident">setMaintenanceHoursBetween</span></span>(<span>self, maintenance_id: int, new_hours_between: float) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set hours between Maintenances.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+<dt><strong><code>new_hours_between</code></strong> :&ensp;<code>float</code></dt>
+<dd>hours between Maintenances</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setMaintenanceHoursBetween(
+    self, maintenance_id: int, new_hours_between: float
+) -&gt; None:
+    &#34;&#34;&#34;Set hours between Maintenances.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+        new_hours_between (float): hours between Maintenances
+    &#34;&#34;&#34;
+    collection = self._db[&#34;maintenances&#34;]
+    collection.update_one(
+        {&#34;maintenance_id&#34;: maintenance_id},
+        {&#34;$set&#34;: {&#34;hours_between&#34;: new_hours_between}},
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setUserAuthorization"><code class="name flex">
+<span>def <span class="ident">setUserAuthorization</span></span>(<span>self, user_id: int, authorization_ids: list[int]) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the authorization for an User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+<dt><strong><code>authorization_ids</code></strong> :&ensp;<code>list[int]</code></dt>
+<dd>Machine types that the User is authorized to use</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setUserAuthorization(
+    self,
+    user_id: int,
+    authorization_ids: list[int],
+) -&gt; None:
+    &#34;&#34;&#34;Set the authorization for an User.
+
+    Args:
+        user_id (int): id of the User
+        authorization_ids (list[int]): Machine types that the User is authorized to use
+    &#34;&#34;&#34;
+    if not isinstance(authorization_ids, list):
+        raise InvalidQueryValueException(&#34;Authorization ids&#34;, authorization_ids)
+
+    machine_types = [m.type_id for m in self.listMachineTypes()]
+    for i in authorization_ids:
+        if not isinstance(i, int):
+            raise InvalidQueryValueException(&#34;Authorization id&#34;, i)
+
+        if i not in machine_types:
+            raise InvalidIdException(&#34;MachineType&#34;, i)
+
+    collection = self._db[&#34;users&#34;]
+    collection.update_one(
+        {&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;authorization_ids&#34;: authorization_ids}}
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setUserCardUUID"><code class="name flex">
+<span>def <span class="ident">setUserCardUUID</span></span>(<span>self, user_id: int, card_UUID: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the UUID of the RFID card for a User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code></dt>
+<dd>UUID of the RFID card</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setUserCardUUID(
+    self,
+    user_id: int,
+    card_UUID: str,
+):
+    &#34;&#34;&#34;Set the UUID of the RFID card for a User.
+
+    Args:
+        user_id (int): id of the User
+        card_UUID (str): UUID of the RFID card
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+    collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;card_UUID&#34;: card_UUID}})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setUserId"><code class="name flex">
+<span>def <span class="ident">setUserId</span></span>(<span>self, user_id: int, new_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the id of a User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+<dt><strong><code>new_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>new id of the User</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setUserId(
+    self,
+    user_id: int,
+    new_id: int,
+) -&gt; None:
+    &#34;&#34;&#34;Set the id of a User.
+
+    Args:
+        user_id (int): id of the User
+        new_id (int): new id of the User
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+    collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;user_id&#34;: new_id}})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.setUserRole"><code class="name flex">
+<span>def <span class="ident">setUserRole</span></span>(<span>self, user_id: int, role_id: int) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the Role of a User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Role</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setUserRole(
+    self,
+    user_id: int,
+    role_id: int,
+) -&gt; None:
+    &#34;&#34;&#34;Set the Role of a User.
+
+    Args:
+        user_id (int): id of the User
+        role_id (int): id of the Role
+    &#34;&#34;&#34;
+    if all(r.role_id != role_id for r in self.listMachines()):
+        raise InvalidIdException(&#34;Role id&#34;, role_id)
+
+    collection = self._db[&#34;users&#34;]
+    collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;role_id&#34;: role_id}})</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="database.Database" href="#database.Database">Database</a></code></h4>
+<ul class="">
+<li><code><a title="database.Database.addMachine" href="#database.Database.addMachine">addMachine</a></code></li>
+<li><code><a title="database.Database.addMachineMaintenance" href="#database.Database.addMachineMaintenance">addMachineMaintenance</a></code></li>
+<li><code><a title="database.Database.addMachineType" href="#database.Database.addMachineType">addMachineType</a></code></li>
+<li><code><a title="database.Database.addMaintenance" href="#database.Database.addMaintenance">addMaintenance</a></code></li>
+<li><code><a title="database.Database.addRole" href="#database.Database.addRole">addRole</a></code></li>
+<li><code><a title="database.Database.addUser" href="#database.Database.addUser">addUser</a></code></li>
+<li><code><a title="database.Database.dropDatabase" href="#database.Database.dropDatabase">dropDatabase</a></code></li>
+<li><code><a title="database.Database.editMachineTypeName" href="#database.Database.editMachineTypeName">editMachineTypeName</a></code></li>
+<li><code><a title="database.Database.editRoleName" href="#database.Database.editRoleName">editRoleName</a></code></li>
+<li><code><a title="database.Database.getMachine" href="#database.Database.getMachine">getMachine</a></code></li>
+<li><code><a title="database.Database.getMachineHours" href="#database.Database.getMachineHours">getMachineHours</a></code></li>
+<li><code><a title="database.Database.getMachineMachineType" href="#database.Database.getMachineMachineType">getMachineMachineType</a></code></li>
+<li><code><a title="database.Database.getMachineMaintenances" href="#database.Database.getMachineMaintenances">getMachineMaintenances</a></code></li>
+<li><code><a title="database.Database.getMachineName" href="#database.Database.getMachineName">getMachineName</a></code></li>
+<li><code><a title="database.Database.getMachineType" href="#database.Database.getMachineType">getMachineType</a></code></li>
+<li><code><a title="database.Database.getMaintenance" href="#database.Database.getMaintenance">getMaintenance</a></code></li>
+<li><code><a title="database.Database.getMaintenanceDescription" href="#database.Database.getMaintenanceDescription">getMaintenanceDescription</a></code></li>
+<li><code><a title="database.Database.getMaintenanceHoursBetween" href="#database.Database.getMaintenanceHoursBetween">getMaintenanceHoursBetween</a></code></li>
+<li><code><a title="database.Database.getRole" href="#database.Database.getRole">getRole</a></code></li>
+<li><code><a title="database.Database.getUser" href="#database.Database.getUser">getUser</a></code></li>
+<li><code><a title="database.Database.getUserAuthorization" href="#database.Database.getUserAuthorization">getUserAuthorization</a></code></li>
+<li><code><a title="database.Database.getUserCardUUID" href="#database.Database.getUserCardUUID">getUserCardUUID</a></code></li>
+<li><code><a title="database.Database.getUserId" href="#database.Database.getUserId">getUserId</a></code></li>
+<li><code><a title="database.Database.getUserRole" href="#database.Database.getUserRole">getUserRole</a></code></li>
+<li><code><a title="database.Database.listMachineTypes" href="#database.Database.listMachineTypes">listMachineTypes</a></code></li>
+<li><code><a title="database.Database.listMachines" href="#database.Database.listMachines">listMachines</a></code></li>
+<li><code><a title="database.Database.listMaintenances" href="#database.Database.listMaintenances">listMaintenances</a></code></li>
+<li><code><a title="database.Database.listRoles" href="#database.Database.listRoles">listRoles</a></code></li>
+<li><code><a title="database.Database.listUsers" href="#database.Database.listUsers">listUsers</a></code></li>
+<li><code><a title="database.Database.removeMachine" href="#database.Database.removeMachine">removeMachine</a></code></li>
+<li><code><a title="database.Database.removeMachineMaintenance" href="#database.Database.removeMachineMaintenance">removeMachineMaintenance</a></code></li>
+<li><code><a title="database.Database.removeMachineType" href="#database.Database.removeMachineType">removeMachineType</a></code></li>
+<li><code><a title="database.Database.removeMaintenance" href="#database.Database.removeMaintenance">removeMaintenance</a></code></li>
+<li><code><a title="database.Database.removeRole" href="#database.Database.removeRole">removeRole</a></code></li>
+<li><code><a title="database.Database.setMachineMachineType" href="#database.Database.setMachineMachineType">setMachineMachineType</a></code></li>
+<li><code><a title="database.Database.setMachineName" href="#database.Database.setMachineName">setMachineName</a></code></li>
+<li><code><a title="database.Database.setMachinesHours" href="#database.Database.setMachinesHours">setMachinesHours</a></code></li>
+<li><code><a title="database.Database.setMaintenanceDescription" href="#database.Database.setMaintenanceDescription">setMaintenanceDescription</a></code></li>
+<li><code><a title="database.Database.setMaintenanceHoursBetween" href="#database.Database.setMaintenanceHoursBetween">setMaintenanceHoursBetween</a></code></li>
+<li><code><a title="database.Database.setUserAuthorization" href="#database.Database.setUserAuthorization">setUserAuthorization</a></code></li>
+<li><code><a title="database.Database.setUserCardUUID" href="#database.Database.setUserCardUUID">setUserCardUUID</a></code></li>
+<li><code><a title="database.Database.setUserId" href="#database.Database.setUserId">setUserId</a></code></li>
+<li><code><a title="database.Database.setUserRole" href="#database.Database.setUserRole">setUserRole</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
