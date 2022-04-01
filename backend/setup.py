@@ -77,7 +77,7 @@ def main():
             machine_id=machine_id, machine_name=machine_name, machine_type=machine_type
         )
 
-    print(d.listRoles())
+    print(d.listMachines())
     print(d.listMachineTypes())
     print(d.listUsers())
     print(d.listMachines())
