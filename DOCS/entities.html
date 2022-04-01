@@ -31,7 +31,6 @@
 
 from dataclasses import dataclass
 from typing import Dict
-from ujson import loads
 
 
 class Serializer:
@@ -44,19 +43,6 @@ class Serializer:
             Dict
         &#34;&#34;&#34;
         return self.__dict__
-
-    @classmethod
-    def deserialize(cls, str_data: str) -&gt; object:
-        &#34;&#34;&#34;Deserialize data and return an object. JSON compatible.
-
-        Args:
-            str_data (str): string data. JSON compatible
-
-        Returns:
-            object: appropriate object type
-        &#34;&#34;&#34;
-        params = loads(str_data.replace(&#34;&#39;&#34;, &#39;&#34;&#39;))
-        return cls(**params)
 
     @classmethod
     def from_dict(cls, dict_data: dict) -&gt; object:
@@ -108,15 +94,15 @@ class Maintenance(Serializer):
     description: str = None
 
 
-# ! not implemented yet
 @dataclass
 class Intervention(Serializer):
     &#34;&#34;&#34;Dataclass handling an intervention.&#34;&#34;&#34;
 
-    maintenance_id: int
-    timestamp: float
     intervention_id: int
+    maintenance_id: int
+    machine_id: int
     user_id: int
+    timestamp: float
 
 
 @dataclass
@@ -154,7 +140,7 @@ class Usage(Serializer):
 <dl>
 <dt id="entities.Intervention"><code class="flex name class">
 <span>class <span class="ident">Intervention</span></span>
-<span>(</span><span>maintenance_id: int, timestamp: float, intervention_id: int, user_id: int)</span>
+<span>(</span><span>intervention_id: int, maintenance_id: int, machine_id: int, user_id: int, timestamp: float)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Dataclass handling an intervention.</p></div>
@@ -166,10 +152,11 @@ class Usage(Serializer):
 class Intervention(Serializer):
     &#34;&#34;&#34;Dataclass handling an intervention.&#34;&#34;&#34;
 
-    maintenance_id: int
-    timestamp: float
     intervention_id: int
-    user_id: int</code></pre>
+    maintenance_id: int
+    machine_id: int
+    user_id: int
+    timestamp: float</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -178,6 +165,10 @@ class Intervention(Serializer):
 <h3>Class variables</h3>
 <dl>
 <dt id="entities.Intervention.intervention_id"><code class="name">var <span class="ident">intervention_id</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="entities.Intervention.machine_id"><code class="name">var <span class="ident">machine_id</span> : int</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -198,7 +189,6 @@ class Intervention(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -261,7 +251,6 @@ class Machine(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -304,7 +293,6 @@ class MachineType(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -352,7 +340,6 @@ class Maintenance(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -395,7 +382,6 @@ class Role(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -423,19 +409,6 @@ class Role(Serializer):
         return self.__dict__
 
     @classmethod
-    def deserialize(cls, str_data: str) -&gt; object:
-        &#34;&#34;&#34;Deserialize data and return an object. JSON compatible.
-
-        Args:
-            str_data (str): string data. JSON compatible
-
-        Returns:
-            object: appropriate object type
-        &#34;&#34;&#34;
-        params = loads(str_data.replace(&#34;&#39;&#34;, &#39;&#34;&#39;))
-        return cls(**params)
-
-    @classmethod
     def from_dict(cls, dict_data: dict) -&gt; object:
         &#34;&#34;&#34;Deserialize data from Dictionary.
 
@@ -459,39 +432,6 @@ class Role(Serializer):
 </ul>
 <h3>Static methods</h3>
 <dl>
-<dt id="entities.Serializer.deserialize"><code class="name flex">
-<span>def <span class="ident">deserialize</span></span>(<span>str_data: str) ‑> object</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Deserialize data and return an object. JSON compatible.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>str_data</code></strong> :&ensp;<code>str</code></dt>
-<dd>string data. JSON compatible</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>object</code></dt>
-<dd>appropriate object type</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@classmethod
-def deserialize(cls, str_data: str) -&gt; object:
-    &#34;&#34;&#34;Deserialize data and return an object. JSON compatible.
-
-    Args:
-        str_data (str): string data. JSON compatible
-
-    Returns:
-        object: appropriate object type
-    &#34;&#34;&#34;
-    params = loads(str_data.replace(&#34;&#39;&#34;, &#39;&#34;&#39;))
-    return cls(**params)</code></pre>
-</details>
-</dd>
 <dt id="entities.Serializer.from_dict"><code class="name flex">
 <span>def <span class="ident">from_dict</span></span>(<span>dict_data: dict) ‑> object</span>
 </code></dt>
@@ -600,7 +540,6 @@ class Usage(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -663,7 +602,6 @@ class User(Serializer):
 <ul class="hlist">
 <li><code><b><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></b></code>:
 <ul class="hlist">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>
@@ -685,6 +623,7 @@ class User(Serializer):
 <h4><code><a title="entities.Intervention" href="#entities.Intervention">Intervention</a></code></h4>
 <ul class="">
 <li><code><a title="entities.Intervention.intervention_id" href="#entities.Intervention.intervention_id">intervention_id</a></code></li>
+<li><code><a title="entities.Intervention.machine_id" href="#entities.Intervention.machine_id">machine_id</a></code></li>
 <li><code><a title="entities.Intervention.maintenance_id" href="#entities.Intervention.maintenance_id">maintenance_id</a></code></li>
 <li><code><a title="entities.Intervention.timestamp" href="#entities.Intervention.timestamp">timestamp</a></code></li>
 <li><code><a title="entities.Intervention.user_id" href="#entities.Intervention.user_id">user_id</a></code></li>
@@ -726,7 +665,6 @@ class User(Serializer):
 <li>
 <h4><code><a title="entities.Serializer" href="#entities.Serializer">Serializer</a></code></h4>
 <ul class="">
-<li><code><a title="entities.Serializer.deserialize" href="#entities.Serializer.deserialize">deserialize</a></code></li>
 <li><code><a title="entities.Serializer.from_dict" href="#entities.Serializer.from_dict">from_dict</a></code></li>
 <li><code><a title="entities.Serializer.serialize" href="#entities.Serializer.serialize">serialize</a></code></li>
 </ul>

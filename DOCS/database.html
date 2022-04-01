@@ -29,14 +29,14 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34;This is the class handling the Database. More to come.&#34;&#34;&#34;
 
-from entities import User, Role, MachineType, Machine, Maintenance
+from entities import User, Role, MachineType, Machine, Maintenance, Intervention
 from exceptions import (
     DuplicatedIdException,
     InvalidIdException,
-    MissingQueryValueException,
-    InvalidQueryValueException,
+    InvalidQueryException,
 )
 
+from time import time
 from pymongo import MongoClient, DESCENDING
 from pymongo.errors import DuplicateKeyError
 
@@ -64,6 +64,7 @@ class Database:
             &#34;users&#34;: &#34;user_id&#34;,
             &#34;machines&#34;: &#34;machine_id&#34;,
             &#34;maintenances&#34;: &#34;maintenance_id&#34;,
+            &#34;interventions&#34;: &#34;intervention_id&#34;,
         }
 
         self._loadSettings()
@@ -114,7 +115,7 @@ class Database:
             role_name (str): name of the Role
         &#34;&#34;&#34;
         collection = self._db[&#34;roles&#34;]
-        r = Role(role_id, role_name)
+        r = Role(role_id=role_id, role_name=role_name)
 
         try:
             collection.insert_one(r.serialize())
@@ -137,7 +138,7 @@ class Database:
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Role id&#34;, role_id)
+            raise InvalidIdException(&#34;Role&#34;, role_id)
 
         for r in self.listRoles():
             if r.role_id == result[&#34;role_id&#34;]:
@@ -181,7 +182,7 @@ class Database:
             type_name (str): name of the MachineType
         &#34;&#34;&#34;
         collection = self._db[&#34;machine_types&#34;]
-        t = MachineType(type_id, type_name)
+        t = MachineType(type_id=type_id, type_name=type_name)
 
         try:
             collection.insert_one(t.serialize())
@@ -204,7 +205,7 @@ class Database:
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;MachineType id&#34;, type_id)
+            raise InvalidIdException(&#34;MachineType&#34;, type_id)
 
         for t in self.listMachineTypes():
             if t.type_id == result[&#34;type_id&#34;]:
@@ -246,8 +247,8 @@ class Database:
         self,
         name: str,
         surname: str,
+        role_id: int,
         user_id: int = None,
-        role_id: int = None,
         card_UUID: str = None,
     ) -&gt; int:
         &#34;&#34;&#34;Add a User to the database.
@@ -255,16 +256,14 @@ class Database:
         Args:
             name (str): Name of the User
             surname (str): Surname of the User
+            role_id (int): id of the Role.
             user_id (int, optional): id of the User, optional. Will be assigned automatically.
-            role_id (int, optional): id of the Role.
             card_UUID (str, optional): UUID of the RFID card.
 
         Returns:
             int: id of the User
         &#34;&#34;&#34;
-        if role_id is not None and all(
-            r.role_id != role_id for r in self.listMachines()
-        ):
+        if all(r.role_id != role_id for r in self.listRoles()):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -277,7 +276,13 @@ class Database:
                 last = list(collection.find({}).sort(&#34;user_id&#34;, DESCENDING).limit(1))[0]
                 user_id = last[&#34;user_id&#34;] + 1
 
-        u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
+        u = User(
+            user_id=user_id,
+            name=name,
+            surname=surname,
+            role_id=role_id,
+            card_UUID=card_UUID,
+        )
 
         try:
             collection.insert_one(u.serialize())
@@ -319,11 +324,9 @@ class Database:
             result = collection.find_one({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;User id&#34;, user_id)
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
         return User.from_dict(result)
-
-        return None
 
     def setUserRole(
         self,
@@ -336,7 +339,7 @@ class Database:
             user_id (int): id of the User
             role_id (int): id of the Role
         &#34;&#34;&#34;
-        if all(r.role_id != role_id for r in self.listMachines()):
+        if all(r.role_id != role_id for r in self.listRoles()):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -358,9 +361,9 @@ class Database:
         )
 
         if result is None:
-            return None
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
-        for r in self.listMachines():
+        for r in self.listRoles():
             if r.role_id == result[&#34;role_id&#34;]:
                 return r
 
@@ -378,25 +381,25 @@ class Database:
         collection = self._db[&#34;users&#34;]
         collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;user_id&#34;: new_id}})
 
-    def getUserId(self, user_name: str = None, user_surname: str = None) -&gt; int:
+    def getUserId(self, name: str, surname: str) -&gt; int:
         &#34;&#34;&#34;Get a User id from its name and surname.
 
         Args:
-            user_name (str): Name of the User.
-            user_surname (str): Surname of the User
+            name (str): Name of the User.
+            surname (str): Surname of the User
 
         Returns:
             int: User id
         &#34;&#34;&#34;
-        if user_name is None or user_surname is None:
-            raise MissingQueryValueException(&#34;Name and Surname&#34;, None)
+        collection = self._db[&#34;users&#34;]
+        result = collection.find_one(
+            {&#34;name&#34;: name, &#34;surname&#34;: surname}, projection={&#34;_id&#34;: 0, &#34;user_id&#34;: 1}
+        )
 
-        user = self.getUser(user_name=user_name, user_surname=user_surname)
+        if result:
+            return result[&#34;user_id&#34;]
 
-        if user:
-            return user.user_id
-
-        return None
+        raise InvalidQueryException(&#34;User name and surname&#34;, f&#34;{name} {surname}&#34;)
 
     def setUserAuthorization(
         self,
@@ -410,13 +413,10 @@ class Database:
             authorization_ids (list[int]): Machine types that the User is authorized to use
         &#34;&#34;&#34;
         if not isinstance(authorization_ids, list):
-            raise InvalidQueryValueException(&#34;Authorization ids&#34;, authorization_ids)
+            raise InvalidQueryException(&#34;Authorization ids&#34;, authorization_ids)
 
         machine_types = [m.type_id for m in self.listMachineTypes()]
         for i in authorization_ids:
-            if not isinstance(i, int):
-                raise InvalidQueryValueException(&#34;Authorization id&#34;, i)
-
             if i not in machine_types:
                 raise InvalidIdException(&#34;MachineType&#34;, i)
 
@@ -441,7 +441,7 @@ class Database:
         )
 
         if result is None:
-            return None
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
         authorizations = []
         for t in self.listMachineTypes():
@@ -480,7 +480,7 @@ class Database:
         )
 
         if result is None:
-            return None
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
         return result[&#34;card_UUID&#34;]
 
@@ -501,7 +501,15 @@ class Database:
         &#34;&#34;&#34;
         collection = self._db[&#34;machines&#34;]
 
-        m = Machine(machine_id, machine_name, machine_type, machine_hours=machine_hours)
+        if all(machine_type != t.type_id for t in self.listMachineTypes()):
+            raise InvalidQueryException(&#34;Machine type&#34;, machine_type)
+
+        m = Machine(
+            machine_id=machine_id,
+            machine_name=machine_name,
+            machine_type=machine_type,
+            machine_hours=machine_hours,
+        )
 
         try:
             collection.insert_one(m.serialize())
@@ -524,7 +532,7 @@ class Database:
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         for m in self.listMachines():
             if m.machine_id == result[&#34;machine_id&#34;]:
@@ -560,9 +568,9 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        return result[&#34;hours_used&#34;]
+        return result[&#34;machine_hours&#34;]
 
     def setMachinesHours(self, machine_id: int, machine_hours: float) -&gt; None:
         &#34;&#34;&#34;Set the Machine hours of a particular Machine.
@@ -573,7 +581,7 @@ class Database:
         &#34;&#34;&#34;
         collection = self._db[&#34;machines&#34;]
         collection.update_one(
-            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;hours_used&#34;: machine_hours}}
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_hours&#34;: machine_hours}}
         )
 
     def getMachineMachineType(self, machine_id: int) -&gt; int:
@@ -589,7 +597,7 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         return result[&#34;machine_type&#34;]
 
@@ -601,7 +609,7 @@ class Database:
             machine_type (int): MachineType id
         &#34;&#34;&#34;
         if machine_type not in [t.type_id for t in self.listMachineTypes()]:
-            raise InvalidQueryValueException(&#34;MachineType id&#34;, machine_type)
+            raise InvalidIdException(&#34;MachineType&#34;, machine_type)
 
         collection = self._db[&#34;machines&#34;]
         collection.update_one(
@@ -621,7 +629,7 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         return result[&#34;machine_name&#34;]
 
@@ -645,15 +653,15 @@ class Database:
             maintenance_id (int): id of the Maintenance
         &#34;&#34;&#34;
         if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if result[&#34;maintenances&#34;] is None:
+        if not result[&#34;maintenances&#34;]:
             collection.update_one(
                 {&#34;machine_id&#34;: machine_id},
                 {&#34;$set&#34;: {&#34;maintenances&#34;: [maintenance_id]}},
@@ -677,10 +685,7 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
-
-        if not result[&#34;maintenances&#34;]:
-            return []
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         return [
             m
@@ -696,16 +701,16 @@ class Database:
             maintenance_id (int): id of the Maintenances
         &#34;&#34;&#34;
         if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if result[&#34;maintenances&#34;] is None:
-            raise InvalidQueryValueException(&#34;Machine&#34;, &#34;maintenances&#34;)
+        if not result[&#34;maintenances&#34;]:
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
         else:
             collection.update_one(
                 {&#34;machine_id&#34;: machine_id},
@@ -764,11 +769,10 @@ class Database:
 
         result = collection.find_one(
             {&#34;maintenance_id&#34;: maintenance_id},
-            projection={&#34;_id&#34;: 0, &#34;maintenance_id&#34;: 1},
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         for m in self.listMaintenances():
             if m.maintenance_id == result[&#34;maintenance_id&#34;]:
@@ -793,10 +797,12 @@ class Database:
             str: description of the Maintenance
         &#34;&#34;&#34;
         collection = self._db[&#34;maintenances&#34;]
-        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+        result = collection.find_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+        )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         return result[&#34;description&#34;]
 
@@ -825,10 +831,12 @@ class Database:
             float: hours between a Maintenance
         &#34;&#34;&#34;
         collection = self._db[&#34;maintenances&#34;]
-        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+        result = collection.find_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+        )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         return result[&#34;hours_between&#34;]
 
@@ -853,7 +861,157 @@ class Database:
         Returns:
             list[Maintenance]: list of Maintenances
         &#34;&#34;&#34;
-        return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]</code></pre>
+        return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]
+
+    def addIntervention(
+        self,
+        maintenance_id: int,
+        machine_id: int,
+        user_id: int,
+        timestamp: float = None,
+    ) -&gt; int:
+        &#34;&#34;&#34;Add Intervention to Database.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+            machine_id (int): id of the Machine
+            user_id (int): id of the User
+            timestamp (float, optional): Intervention timestamp. \
+                If not provided, current time is used
+
+        Returns:
+            int: id of the Intervention
+        &#34;&#34;&#34;
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        if all(machine_id != m.machine_id for m in self.listMachines()):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
+
+        if all(user_id != u.user_id for u in self.listUsers()):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db[&#34;interventions&#34;]
+        if collection.count_documents({}) == 0:
+            intervention_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(
+                collection.find({}).sort(&#34;intervention_id&#34;, DESCENDING).limit(1)
+            )[0]
+            intervention_id = last[&#34;intervention_id&#34;] + 1
+
+        i = Intervention(
+            intervention_id=intervention_id,
+            maintenance_id=maintenance_id,
+            machine_id=machine_id,
+            user_id=user_id,
+            timestamp=timestamp,
+        )
+
+        collection.insert_one(i.serialize())
+
+        return intervention_id
+
+    def getIntervention(self, intervention_id: int) -&gt; Intervention:
+        &#34;&#34;&#34;Get Intervention according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            Intervention
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;intervention_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        for i in self.listInterventions():
+            if i.intervention_id == result[&#34;intervention_id&#34;]:
+                return i
+
+    def listInterventions(self) -&gt; list[Intervention]:
+        &#34;&#34;&#34;Return the Interventions in the database.
+
+        Returns:
+            list[Intervention]: list of interventions
+        &#34;&#34;&#34;
+        return [
+            Intervention.from_dict(i) for i in self._queryCollection((&#34;interventions&#34;))
+        ]
+
+    def getInterventionUser(self, intervention_id: int) -&gt; User:
+        &#34;&#34;&#34;Get User relative to intervention, according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;user_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        for u in self.listUsers():
+            if u.user_id == result[&#34;user_id&#34;]:
+                return u
+
+    def getInterventionMachine(self, intervention_id: int) -&gt; Machine:
+        &#34;&#34;&#34;Get Machine relative to interventon, according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;machine_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        for m in self.listMachines():
+            if m.machine_id == result[&#34;machine_id&#34;]:
+                return m
+
+    def getInterventionTimestamp(self, intervention_id: int) -&gt; float:
+        &#34;&#34;&#34;Get timestamp relative to Intervention according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            float: timestamp
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;timestamp&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        return result[&#34;timestamp&#34;]</code></pre>
 </details>
 </section>
 <section>
@@ -902,6 +1060,7 @@ class Database:
             &#34;users&#34;: &#34;user_id&#34;,
             &#34;machines&#34;: &#34;machine_id&#34;,
             &#34;maintenances&#34;: &#34;maintenance_id&#34;,
+            &#34;interventions&#34;: &#34;intervention_id&#34;,
         }
 
         self._loadSettings()
@@ -952,7 +1111,7 @@ class Database:
             role_name (str): name of the Role
         &#34;&#34;&#34;
         collection = self._db[&#34;roles&#34;]
-        r = Role(role_id, role_name)
+        r = Role(role_id=role_id, role_name=role_name)
 
         try:
             collection.insert_one(r.serialize())
@@ -975,7 +1134,7 @@ class Database:
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Role id&#34;, role_id)
+            raise InvalidIdException(&#34;Role&#34;, role_id)
 
         for r in self.listRoles():
             if r.role_id == result[&#34;role_id&#34;]:
@@ -1019,7 +1178,7 @@ class Database:
             type_name (str): name of the MachineType
         &#34;&#34;&#34;
         collection = self._db[&#34;machine_types&#34;]
-        t = MachineType(type_id, type_name)
+        t = MachineType(type_id=type_id, type_name=type_name)
 
         try:
             collection.insert_one(t.serialize())
@@ -1042,7 +1201,7 @@ class Database:
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;MachineType id&#34;, type_id)
+            raise InvalidIdException(&#34;MachineType&#34;, type_id)
 
         for t in self.listMachineTypes():
             if t.type_id == result[&#34;type_id&#34;]:
@@ -1084,8 +1243,8 @@ class Database:
         self,
         name: str,
         surname: str,
+        role_id: int,
         user_id: int = None,
-        role_id: int = None,
         card_UUID: str = None,
     ) -&gt; int:
         &#34;&#34;&#34;Add a User to the database.
@@ -1093,16 +1252,14 @@ class Database:
         Args:
             name (str): Name of the User
             surname (str): Surname of the User
+            role_id (int): id of the Role.
             user_id (int, optional): id of the User, optional. Will be assigned automatically.
-            role_id (int, optional): id of the Role.
             card_UUID (str, optional): UUID of the RFID card.
 
         Returns:
             int: id of the User
         &#34;&#34;&#34;
-        if role_id is not None and all(
-            r.role_id != role_id for r in self.listMachines()
-        ):
+        if all(r.role_id != role_id for r in self.listRoles()):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -1115,7 +1272,13 @@ class Database:
                 last = list(collection.find({}).sort(&#34;user_id&#34;, DESCENDING).limit(1))[0]
                 user_id = last[&#34;user_id&#34;] + 1
 
-        u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
+        u = User(
+            user_id=user_id,
+            name=name,
+            surname=surname,
+            role_id=role_id,
+            card_UUID=card_UUID,
+        )
 
         try:
             collection.insert_one(u.serialize())
@@ -1157,11 +1320,9 @@ class Database:
             result = collection.find_one({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;User id&#34;, user_id)
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
         return User.from_dict(result)
-
-        return None
 
     def setUserRole(
         self,
@@ -1174,7 +1335,7 @@ class Database:
             user_id (int): id of the User
             role_id (int): id of the Role
         &#34;&#34;&#34;
-        if all(r.role_id != role_id for r in self.listMachines()):
+        if all(r.role_id != role_id for r in self.listRoles()):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -1196,9 +1357,9 @@ class Database:
         )
 
         if result is None:
-            return None
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
-        for r in self.listMachines():
+        for r in self.listRoles():
             if r.role_id == result[&#34;role_id&#34;]:
                 return r
 
@@ -1216,25 +1377,25 @@ class Database:
         collection = self._db[&#34;users&#34;]
         collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;user_id&#34;: new_id}})
 
-    def getUserId(self, user_name: str = None, user_surname: str = None) -&gt; int:
+    def getUserId(self, name: str, surname: str) -&gt; int:
         &#34;&#34;&#34;Get a User id from its name and surname.
 
         Args:
-            user_name (str): Name of the User.
-            user_surname (str): Surname of the User
+            name (str): Name of the User.
+            surname (str): Surname of the User
 
         Returns:
             int: User id
         &#34;&#34;&#34;
-        if user_name is None or user_surname is None:
-            raise MissingQueryValueException(&#34;Name and Surname&#34;, None)
+        collection = self._db[&#34;users&#34;]
+        result = collection.find_one(
+            {&#34;name&#34;: name, &#34;surname&#34;: surname}, projection={&#34;_id&#34;: 0, &#34;user_id&#34;: 1}
+        )
 
-        user = self.getUser(user_name=user_name, user_surname=user_surname)
+        if result:
+            return result[&#34;user_id&#34;]
 
-        if user:
-            return user.user_id
-
-        return None
+        raise InvalidQueryException(&#34;User name and surname&#34;, f&#34;{name} {surname}&#34;)
 
     def setUserAuthorization(
         self,
@@ -1248,13 +1409,10 @@ class Database:
             authorization_ids (list[int]): Machine types that the User is authorized to use
         &#34;&#34;&#34;
         if not isinstance(authorization_ids, list):
-            raise InvalidQueryValueException(&#34;Authorization ids&#34;, authorization_ids)
+            raise InvalidQueryException(&#34;Authorization ids&#34;, authorization_ids)
 
         machine_types = [m.type_id for m in self.listMachineTypes()]
         for i in authorization_ids:
-            if not isinstance(i, int):
-                raise InvalidQueryValueException(&#34;Authorization id&#34;, i)
-
             if i not in machine_types:
                 raise InvalidIdException(&#34;MachineType&#34;, i)
 
@@ -1279,7 +1437,7 @@ class Database:
         )
 
         if result is None:
-            return None
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
         authorizations = []
         for t in self.listMachineTypes():
@@ -1318,7 +1476,7 @@ class Database:
         )
 
         if result is None:
-            return None
+            raise InvalidIdException(&#34;User&#34;, user_id)
 
         return result[&#34;card_UUID&#34;]
 
@@ -1339,7 +1497,15 @@ class Database:
         &#34;&#34;&#34;
         collection = self._db[&#34;machines&#34;]
 
-        m = Machine(machine_id, machine_name, machine_type, machine_hours=machine_hours)
+        if all(machine_type != t.type_id for t in self.listMachineTypes()):
+            raise InvalidQueryException(&#34;Machine type&#34;, machine_type)
+
+        m = Machine(
+            machine_id=machine_id,
+            machine_name=machine_name,
+            machine_type=machine_type,
+            machine_hours=machine_hours,
+        )
 
         try:
             collection.insert_one(m.serialize())
@@ -1362,7 +1528,7 @@ class Database:
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         for m in self.listMachines():
             if m.machine_id == result[&#34;machine_id&#34;]:
@@ -1398,9 +1564,9 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        return result[&#34;hours_used&#34;]
+        return result[&#34;machine_hours&#34;]
 
     def setMachinesHours(self, machine_id: int, machine_hours: float) -&gt; None:
         &#34;&#34;&#34;Set the Machine hours of a particular Machine.
@@ -1411,7 +1577,7 @@ class Database:
         &#34;&#34;&#34;
         collection = self._db[&#34;machines&#34;]
         collection.update_one(
-            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;hours_used&#34;: machine_hours}}
+            {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_hours&#34;: machine_hours}}
         )
 
     def getMachineMachineType(self, machine_id: int) -&gt; int:
@@ -1427,7 +1593,7 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         return result[&#34;machine_type&#34;]
 
@@ -1439,7 +1605,7 @@ class Database:
             machine_type (int): MachineType id
         &#34;&#34;&#34;
         if machine_type not in [t.type_id for t in self.listMachineTypes()]:
-            raise InvalidQueryValueException(&#34;MachineType id&#34;, machine_type)
+            raise InvalidIdException(&#34;MachineType&#34;, machine_type)
 
         collection = self._db[&#34;machines&#34;]
         collection.update_one(
@@ -1459,7 +1625,7 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         return result[&#34;machine_name&#34;]
 
@@ -1483,15 +1649,15 @@ class Database:
             maintenance_id (int): id of the Maintenance
         &#34;&#34;&#34;
         if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if result[&#34;maintenances&#34;] is None:
+        if not result[&#34;maintenances&#34;]:
             collection.update_one(
                 {&#34;machine_id&#34;: machine_id},
                 {&#34;$set&#34;: {&#34;maintenances&#34;: [maintenance_id]}},
@@ -1515,10 +1681,7 @@ class Database:
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
-
-        if not result[&#34;maintenances&#34;]:
-            return []
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         return [
             m
@@ -1534,16 +1697,16 @@ class Database:
             maintenance_id (int): id of the Maintenances
         &#34;&#34;&#34;
         if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if result[&#34;maintenances&#34;] is None:
-            raise InvalidQueryValueException(&#34;Machine&#34;, &#34;maintenances&#34;)
+        if not result[&#34;maintenances&#34;]:
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
         else:
             collection.update_one(
                 {&#34;machine_id&#34;: machine_id},
@@ -1602,11 +1765,10 @@ class Database:
 
         result = collection.find_one(
             {&#34;maintenance_id&#34;: maintenance_id},
-            projection={&#34;_id&#34;: 0, &#34;maintenance_id&#34;: 1},
         )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         for m in self.listMaintenances():
             if m.maintenance_id == result[&#34;maintenance_id&#34;]:
@@ -1631,10 +1793,12 @@ class Database:
             str: description of the Maintenance
         &#34;&#34;&#34;
         collection = self._db[&#34;maintenances&#34;]
-        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+        result = collection.find_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+        )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         return result[&#34;description&#34;]
 
@@ -1663,10 +1827,12 @@ class Database:
             float: hours between a Maintenance
         &#34;&#34;&#34;
         collection = self._db[&#34;maintenances&#34;]
-        result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+        result = collection.find_one(
+            {&#34;maintenance_id&#34;: maintenance_id},
+        )
 
         if result is None:
-            raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
         return result[&#34;hours_between&#34;]
 
@@ -1691,10 +1857,240 @@ class Database:
         Returns:
             list[Maintenance]: list of Maintenances
         &#34;&#34;&#34;
-        return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]</code></pre>
+        return [Maintenance.from_dict(m) for m in self._queryCollection(&#34;maintenances&#34;)]
+
+    def addIntervention(
+        self,
+        maintenance_id: int,
+        machine_id: int,
+        user_id: int,
+        timestamp: float = None,
+    ) -&gt; int:
+        &#34;&#34;&#34;Add Intervention to Database.
+
+        Args:
+            maintenance_id (int): id of the Maintenance
+            machine_id (int): id of the Machine
+            user_id (int): id of the User
+            timestamp (float, optional): Intervention timestamp. \
+                If not provided, current time is used
+
+        Returns:
+            int: id of the Intervention
+        &#34;&#34;&#34;
+        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+            raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        if all(machine_id != m.machine_id for m in self.listMachines()):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
+
+        if all(user_id != u.user_id for u in self.listUsers()):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db[&#34;interventions&#34;]
+        if collection.count_documents({}) == 0:
+            intervention_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(
+                collection.find({}).sort(&#34;intervention_id&#34;, DESCENDING).limit(1)
+            )[0]
+            intervention_id = last[&#34;intervention_id&#34;] + 1
+
+        i = Intervention(
+            intervention_id=intervention_id,
+            maintenance_id=maintenance_id,
+            machine_id=machine_id,
+            user_id=user_id,
+            timestamp=timestamp,
+        )
+
+        collection.insert_one(i.serialize())
+
+        return intervention_id
+
+    def getIntervention(self, intervention_id: int) -&gt; Intervention:
+        &#34;&#34;&#34;Get Intervention according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            Intervention
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;intervention_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        for i in self.listInterventions():
+            if i.intervention_id == result[&#34;intervention_id&#34;]:
+                return i
+
+    def listInterventions(self) -&gt; list[Intervention]:
+        &#34;&#34;&#34;Return the Interventions in the database.
+
+        Returns:
+            list[Intervention]: list of interventions
+        &#34;&#34;&#34;
+        return [
+            Intervention.from_dict(i) for i in self._queryCollection((&#34;interventions&#34;))
+        ]
+
+    def getInterventionUser(self, intervention_id: int) -&gt; User:
+        &#34;&#34;&#34;Get User relative to intervention, according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;user_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        for u in self.listUsers():
+            if u.user_id == result[&#34;user_id&#34;]:
+                return u
+
+    def getInterventionMachine(self, intervention_id: int) -&gt; Machine:
+        &#34;&#34;&#34;Get Machine relative to interventon, according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            Machine
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;machine_id&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        for m in self.listMachines():
+            if m.machine_id == result[&#34;machine_id&#34;]:
+                return m
+
+    def getInterventionTimestamp(self, intervention_id: int) -&gt; float:
+        &#34;&#34;&#34;Get timestamp relative to Intervention according to its id.
+
+        Args:
+            intervention_id (int): id of the Intervention
+
+        Returns:
+            float: timestamp
+        &#34;&#34;&#34;
+        collection = self._db[&#34;interventions&#34;]
+        result = collection.find_one(
+            {&#34;intervention_id&#34;: intervention_id},
+            projection={&#34;_id&#34;: 0, &#34;timestamp&#34;: 1},
+        )
+
+        if result is None:
+            raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+        return result[&#34;timestamp&#34;]</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="database.Database.addIntervention"><code class="name flex">
+<span>def <span class="ident">addIntervention</span></span>(<span>self, maintenance_id: int, machine_id: int, user_id: int, timestamp: float = None) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add Intervention to Database.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>maintenance_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Maintenance</dd>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+<dt><strong><code>timestamp</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Intervention timestamp.
+If not provided, current time is used</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>id of the Intervention</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addIntervention(
+    self,
+    maintenance_id: int,
+    machine_id: int,
+    user_id: int,
+    timestamp: float = None,
+) -&gt; int:
+    &#34;&#34;&#34;Add Intervention to Database.
+
+    Args:
+        maintenance_id (int): id of the Maintenance
+        machine_id (int): id of the Machine
+        user_id (int): id of the User
+        timestamp (float, optional): Intervention timestamp. \
+            If not provided, current time is used
+
+    Returns:
+        int: id of the Intervention
+    &#34;&#34;&#34;
+    if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+    if all(machine_id != m.machine_id for m in self.listMachines()):
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
+
+    if all(user_id != u.user_id for u in self.listUsers()):
+        raise InvalidIdException(&#34;User&#34;, user_id)
+
+    if timestamp is None:
+        timestamp = time()
+
+    collection = self._db[&#34;interventions&#34;]
+    if collection.count_documents({}) == 0:
+        intervention_id = 0
+    else:
+        # find the highest User id and add 1
+        last = list(
+            collection.find({}).sort(&#34;intervention_id&#34;, DESCENDING).limit(1)
+        )[0]
+        intervention_id = last[&#34;intervention_id&#34;] + 1
+
+    i = Intervention(
+        intervention_id=intervention_id,
+        maintenance_id=maintenance_id,
+        machine_id=machine_id,
+        user_id=user_id,
+        timestamp=timestamp,
+    )
+
+    collection.insert_one(i.serialize())
+
+    return intervention_id</code></pre>
+</details>
+</dd>
 <dt id="database.Database.addMachine"><code class="name flex">
 <span>def <span class="ident">addMachine</span></span>(<span>self, machine_id: int, machine_name: str, machine_type: int, machine_hours: float = 0) ‑> None</span>
 </code></dt>
@@ -1732,7 +2128,15 @@ class Database:
     &#34;&#34;&#34;
     collection = self._db[&#34;machines&#34;]
 
-    m = Machine(machine_id, machine_name, machine_type, machine_hours=machine_hours)
+    if all(machine_type != t.type_id for t in self.listMachineTypes()):
+        raise InvalidQueryException(&#34;Machine type&#34;, machine_type)
+
+    m = Machine(
+        machine_id=machine_id,
+        machine_name=machine_name,
+        machine_type=machine_type,
+        machine_hours=machine_hours,
+    )
 
     try:
         collection.insert_one(m.serialize())
@@ -1764,15 +2168,15 @@ class Database:
         maintenance_id (int): id of the Maintenance
     &#34;&#34;&#34;
     if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
-        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+        raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
     collection = self._db[&#34;machines&#34;]
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-    if result[&#34;maintenances&#34;] is None:
+    if not result[&#34;maintenances&#34;]:
         collection.update_one(
             {&#34;machine_id&#34;: machine_id},
             {&#34;$set&#34;: {&#34;maintenances&#34;: [maintenance_id]}},
@@ -1808,7 +2212,7 @@ class Database:
         type_name (str): name of the MachineType
     &#34;&#34;&#34;
     collection = self._db[&#34;machine_types&#34;]
-    t = MachineType(type_id, type_name)
+    t = MachineType(type_id=type_id, type_name=type_name)
 
     try:
         collection.insert_one(t.serialize())
@@ -1904,7 +2308,7 @@ not passed.</dd>
         role_name (str): name of the Role
     &#34;&#34;&#34;
     collection = self._db[&#34;roles&#34;]
-    r = Role(role_id, role_name)
+    r = Role(role_id=role_id, role_name=role_name)
 
     try:
         collection.insert_one(r.serialize())
@@ -1913,7 +2317,7 @@ not passed.</dd>
 </details>
 </dd>
 <dt id="database.Database.addUser"><code class="name flex">
-<span>def <span class="ident">addUser</span></span>(<span>self, name: str, surname: str, user_id: int = None, role_id: int = None, card_UUID: str = None) ‑> int</span>
+<span>def <span class="ident">addUser</span></span>(<span>self, name: str, surname: str, role_id: int, user_id: int = None, card_UUID: str = None) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Add a User to the database.</p>
@@ -1923,10 +2327,10 @@ not passed.</dd>
 <dd>Name of the User</dd>
 <dt><strong><code>surname</code></strong> :&ensp;<code>str</code></dt>
 <dd>Surname of the User</dd>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Role.</dd>
 <dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>id of the User, optional. Will be assigned automatically.</dd>
-<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>id of the Role.</dd>
 <dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>UUID of the RFID card.</dd>
 </dl>
@@ -1943,8 +2347,8 @@ not passed.</dd>
     self,
     name: str,
     surname: str,
+    role_id: int,
     user_id: int = None,
-    role_id: int = None,
     card_UUID: str = None,
 ) -&gt; int:
     &#34;&#34;&#34;Add a User to the database.
@@ -1952,16 +2356,14 @@ not passed.</dd>
     Args:
         name (str): Name of the User
         surname (str): Surname of the User
+        role_id (int): id of the Role.
         user_id (int, optional): id of the User, optional. Will be assigned automatically.
-        role_id (int, optional): id of the Role.
         card_UUID (str, optional): UUID of the RFID card.
 
     Returns:
         int: id of the User
     &#34;&#34;&#34;
-    if role_id is not None and all(
-        r.role_id != role_id for r in self.listMachines()
-    ):
+    if all(r.role_id != role_id for r in self.listRoles()):
         raise InvalidIdException(&#34;Role id&#34;, role_id)
 
     collection = self._db[&#34;users&#34;]
@@ -1974,7 +2376,13 @@ not passed.</dd>
             last = list(collection.find({}).sort(&#34;user_id&#34;, DESCENDING).limit(1))[0]
             user_id = last[&#34;user_id&#34;] + 1
 
-    u = User(user_id, name, surname, role_id=role_id, card_UUID=card_UUID)
+    u = User(
+        user_id=user_id,
+        name=name,
+        surname=surname,
+        role_id=role_id,
+        card_UUID=card_UUID,
+    )
 
     try:
         collection.insert_one(u.serialize())
@@ -2058,6 +2466,164 @@ not passed.</dd>
     )</code></pre>
 </details>
 </dd>
+<dt id="database.Database.getIntervention"><code class="name flex">
+<span>def <span class="ident">getIntervention</span></span>(<span>self, intervention_id: int) ‑> <a title="entities.Intervention" href="entities.html#entities.Intervention">Intervention</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Intervention according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>intervention_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Intervention</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Intervention</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getIntervention(self, intervention_id: int) -&gt; Intervention:
+    &#34;&#34;&#34;Get Intervention according to its id.
+
+    Args:
+        intervention_id (int): id of the Intervention
+
+    Returns:
+        Intervention
+    &#34;&#34;&#34;
+    collection = self._db[&#34;interventions&#34;]
+
+    result = collection.find_one(
+        {&#34;intervention_id&#34;: intervention_id},
+        projection={&#34;_id&#34;: 0, &#34;intervention_id&#34;: 1},
+    )
+
+    if result is None:
+        raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+    for i in self.listInterventions():
+        if i.intervention_id == result[&#34;intervention_id&#34;]:
+            return i</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getInterventionMachine"><code class="name flex">
+<span>def <span class="ident">getInterventionMachine</span></span>(<span>self, intervention_id: int) ‑> <a title="entities.Machine" href="entities.html#entities.Machine">Machine</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Machine relative to interventon, according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>intervention_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Intervention</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Machine</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getInterventionMachine(self, intervention_id: int) -&gt; Machine:
+    &#34;&#34;&#34;Get Machine relative to interventon, according to its id.
+
+    Args:
+        intervention_id (int): id of the Intervention
+
+    Returns:
+        Machine
+    &#34;&#34;&#34;
+    collection = self._db[&#34;interventions&#34;]
+    result = collection.find_one(
+        {&#34;intervention_id&#34;: intervention_id},
+        projection={&#34;_id&#34;: 0, &#34;machine_id&#34;: 1},
+    )
+
+    if result is None:
+        raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+    for m in self.listMachines():
+        if m.machine_id == result[&#34;machine_id&#34;]:
+            return m</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getInterventionTimestamp"><code class="name flex">
+<span>def <span class="ident">getInterventionTimestamp</span></span>(<span>self, intervention_id: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get timestamp relative to Intervention according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>intervention_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Intervention</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>timestamp</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getInterventionTimestamp(self, intervention_id: int) -&gt; float:
+    &#34;&#34;&#34;Get timestamp relative to Intervention according to its id.
+
+    Args:
+        intervention_id (int): id of the Intervention
+
+    Returns:
+        float: timestamp
+    &#34;&#34;&#34;
+    collection = self._db[&#34;interventions&#34;]
+    result = collection.find_one(
+        {&#34;intervention_id&#34;: intervention_id},
+        projection={&#34;_id&#34;: 0, &#34;timestamp&#34;: 1},
+    )
+
+    if result is None:
+        raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+    return result[&#34;timestamp&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getInterventionUser"><code class="name flex">
+<span>def <span class="ident">getInterventionUser</span></span>(<span>self, intervention_id: int) ‑> <a title="entities.User" href="entities.html#entities.User">User</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get User relative to intervention, according to its id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>intervention_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Intervention</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>User</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getInterventionUser(self, intervention_id: int) -&gt; User:
+    &#34;&#34;&#34;Get User relative to intervention, according to its id.
+
+    Args:
+        intervention_id (int): id of the Intervention
+
+    Returns:
+        User
+    &#34;&#34;&#34;
+    collection = self._db[&#34;interventions&#34;]
+    result = collection.find_one(
+        {&#34;intervention_id&#34;: intervention_id},
+        projection={&#34;_id&#34;: 0, &#34;user_id&#34;: 1},
+    )
+
+    if result is None:
+        raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
+
+    for u in self.listUsers():
+        if u.user_id == result[&#34;user_id&#34;]:
+            return u</code></pre>
+</details>
+</dd>
 <dt id="database.Database.getMachine"><code class="name flex">
 <span>def <span class="ident">getMachine</span></span>(<span>self, machine_id: int) ‑> <a title="entities.Machine" href="entities.html#entities.Machine">Machine</a></span>
 </code></dt>
@@ -2090,7 +2656,7 @@ not passed.</dd>
     )
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     for m in self.listMachines():
         if m.machine_id == result[&#34;machine_id&#34;]:
@@ -2129,9 +2695,9 @@ not passed.</dd>
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-    return result[&#34;hours_used&#34;]</code></pre>
+    return result[&#34;machine_hours&#34;]</code></pre>
 </details>
 </dd>
 <dt id="database.Database.getMachineMachineType"><code class="name flex">
@@ -2166,7 +2732,7 @@ not passed.</dd>
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     return result[&#34;machine_type&#34;]</code></pre>
 </details>
@@ -2203,10 +2769,7 @@ not passed.</dd>
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
-
-    if not result[&#34;maintenances&#34;]:
-        return []
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     return [
         m
@@ -2247,7 +2810,7 @@ not passed.</dd>
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     return result[&#34;machine_name&#34;]</code></pre>
 </details>
@@ -2284,7 +2847,7 @@ not passed.</dd>
     )
 
     if result is None:
-        raise InvalidQueryValueException(&#34;MachineType id&#34;, type_id)
+        raise InvalidIdException(&#34;MachineType&#34;, type_id)
 
     for t in self.listMachineTypes():
         if t.type_id == result[&#34;type_id&#34;]:
@@ -2320,11 +2883,10 @@ not passed.</dd>
 
     result = collection.find_one(
         {&#34;maintenance_id&#34;: maintenance_id},
-        projection={&#34;_id&#34;: 0, &#34;maintenance_id&#34;: 1},
     )
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+        raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
     for m in self.listMaintenances():
         if m.maintenance_id == result[&#34;maintenance_id&#34;]:
@@ -2360,10 +2922,12 @@ not passed.</dd>
         str: description of the Maintenance
     &#34;&#34;&#34;
     collection = self._db[&#34;maintenances&#34;]
-    result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+    result = collection.find_one(
+        {&#34;maintenance_id&#34;: maintenance_id},
+    )
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+        raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
     return result[&#34;description&#34;]</code></pre>
 </details>
@@ -2397,10 +2961,12 @@ not passed.</dd>
         float: hours between a Maintenance
     &#34;&#34;&#34;
     collection = self._db[&#34;maintenances&#34;]
-    result = collection.find_one({&#34;maintenance_id&#34;: maintenance_id})
+    result = collection.find_one(
+        {&#34;maintenance_id&#34;: maintenance_id},
+    )
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+        raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
     return result[&#34;hours_between&#34;]</code></pre>
 </details>
@@ -2437,7 +3003,7 @@ not passed.</dd>
     )
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Role id&#34;, role_id)
+        raise InvalidIdException(&#34;Role&#34;, role_id)
 
     for r in self.listRoles():
         if r.role_id == result[&#34;role_id&#34;]:
@@ -2492,11 +3058,9 @@ Not necessary if id is provided.</dd>
         result = collection.find_one({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;User id&#34;, user_id)
+        raise InvalidIdException(&#34;User&#34;, user_id)
 
-    return User.from_dict(result)
-
-    return None</code></pre>
+    return User.from_dict(result)</code></pre>
 </details>
 </dd>
 <dt id="database.Database.getUserAuthorization"><code class="name flex">
@@ -2534,7 +3098,7 @@ Not necessary if id is provided.</dd>
     )
 
     if result is None:
-        return None
+        raise InvalidIdException(&#34;User&#34;, user_id)
 
     authorizations = []
     for t in self.listMachineTypes():
@@ -2579,21 +3143,21 @@ Not necessary if id is provided.</dd>
     )
 
     if result is None:
-        return None
+        raise InvalidIdException(&#34;User&#34;, user_id)
 
     return result[&#34;card_UUID&#34;]</code></pre>
 </details>
 </dd>
 <dt id="database.Database.getUserId"><code class="name flex">
-<span>def <span class="ident">getUserId</span></span>(<span>self, user_name: str = None, user_surname: str = None) ‑> int</span>
+<span>def <span class="ident">getUserId</span></span>(<span>self, name: str, surname: str) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get a User id from its name and surname.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>user_name</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
 <dd>Name of the User.</dd>
-<dt><strong><code>user_surname</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>surname</code></strong> :&ensp;<code>str</code></dt>
 <dd>Surname of the User</dd>
 </dl>
 <h2 id="returns">Returns</h2>
@@ -2605,25 +3169,25 @@ Not necessary if id is provided.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getUserId(self, user_name: str = None, user_surname: str = None) -&gt; int:
+<pre><code class="python">def getUserId(self, name: str, surname: str) -&gt; int:
     &#34;&#34;&#34;Get a User id from its name and surname.
 
     Args:
-        user_name (str): Name of the User.
-        user_surname (str): Surname of the User
+        name (str): Name of the User.
+        surname (str): Surname of the User
 
     Returns:
         int: User id
     &#34;&#34;&#34;
-    if user_name is None or user_surname is None:
-        raise MissingQueryValueException(&#34;Name and Surname&#34;, None)
+    collection = self._db[&#34;users&#34;]
+    result = collection.find_one(
+        {&#34;name&#34;: name, &#34;surname&#34;: surname}, projection={&#34;_id&#34;: 0, &#34;user_id&#34;: 1}
+    )
 
-    user = self.getUser(user_name=user_name, user_surname=user_surname)
+    if result:
+        return result[&#34;user_id&#34;]
 
-    if user:
-        return user.user_id
-
-    return None</code></pre>
+    raise InvalidQueryException(&#34;User name and surname&#34;, f&#34;{name} {surname}&#34;)</code></pre>
 </details>
 </dd>
 <dt id="database.Database.getUserRole"><code class="name flex">
@@ -2658,11 +3222,36 @@ Not necessary if id is provided.</dd>
     )
 
     if result is None:
-        return None
+        raise InvalidIdException(&#34;User&#34;, user_id)
 
-    for r in self.listMachines():
+    for r in self.listRoles():
         if r.role_id == result[&#34;role_id&#34;]:
             return r</code></pre>
+</details>
+</dd>
+<dt id="database.Database.listInterventions"><code class="name flex">
+<span>def <span class="ident">listInterventions</span></span>(<span>self) ‑> list[<a title="entities.Intervention" href="entities.html#entities.Intervention">Intervention</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the Interventions in the database.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Intervention]</code></dt>
+<dd>list of interventions</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def listInterventions(self) -&gt; list[Intervention]:
+    &#34;&#34;&#34;Return the Interventions in the database.
+
+    Returns:
+        list[Intervention]: list of interventions
+    &#34;&#34;&#34;
+    return [
+        Intervention.from_dict(i) for i in self._queryCollection((&#34;interventions&#34;))
+    ]</code></pre>
 </details>
 </dd>
 <dt id="database.Database.listMachineTypes"><code class="name flex">
@@ -2827,16 +3416,16 @@ Not necessary if id is provided.</dd>
         maintenance_id (int): id of the Maintenances
     &#34;&#34;&#34;
     if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
-        raise InvalidQueryValueException(&#34;Maintenance id&#34;, maintenance_id)
+        raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
     collection = self._db[&#34;machines&#34;]
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
     if result is None:
-        raise InvalidQueryValueException(&#34;Machine id&#34;, machine_id)
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-    if result[&#34;maintenances&#34;] is None:
-        raise InvalidQueryValueException(&#34;Machine&#34;, &#34;maintenances&#34;)
+    if not result[&#34;maintenances&#34;]:
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
     else:
         collection.update_one(
             {&#34;machine_id&#34;: machine_id},
@@ -2940,7 +3529,7 @@ Not necessary if id is provided.</dd>
         machine_type (int): MachineType id
     &#34;&#34;&#34;
     if machine_type not in [t.type_id for t in self.listMachineTypes()]:
-        raise InvalidQueryValueException(&#34;MachineType id&#34;, machine_type)
+        raise InvalidIdException(&#34;MachineType&#34;, machine_type)
 
     collection = self._db[&#34;machines&#34;]
     collection.update_one(
@@ -3002,7 +3591,7 @@ Not necessary if id is provided.</dd>
     &#34;&#34;&#34;
     collection = self._db[&#34;machines&#34;]
     collection.update_one(
-        {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;hours_used&#34;: machine_hours}}
+        {&#34;machine_id&#34;: machine_id}, {&#34;$set&#34;: {&#34;machine_hours&#34;: machine_hours}}
     )</code></pre>
 </details>
 </dd>
@@ -3098,13 +3687,10 @@ Not necessary if id is provided.</dd>
         authorization_ids (list[int]): Machine types that the User is authorized to use
     &#34;&#34;&#34;
     if not isinstance(authorization_ids, list):
-        raise InvalidQueryValueException(&#34;Authorization ids&#34;, authorization_ids)
+        raise InvalidQueryException(&#34;Authorization ids&#34;, authorization_ids)
 
     machine_types = [m.type_id for m in self.listMachineTypes()]
     for i in authorization_ids:
-        if not isinstance(i, int):
-            raise InvalidQueryValueException(&#34;Authorization id&#34;, i)
-
         if i not in machine_types:
             raise InvalidIdException(&#34;MachineType&#34;, i)
 
@@ -3203,7 +3789,7 @@ Not necessary if id is provided.</dd>
         user_id (int): id of the User
         role_id (int): id of the Role
     &#34;&#34;&#34;
-    if all(r.role_id != role_id for r in self.listMachines()):
+    if all(r.role_id != role_id for r in self.listRoles()):
         raise InvalidIdException(&#34;Role id&#34;, role_id)
 
     collection = self._db[&#34;users&#34;]
@@ -3226,6 +3812,7 @@ Not necessary if id is provided.</dd>
 <li>
 <h4><code><a title="database.Database" href="#database.Database">Database</a></code></h4>
 <ul class="">
+<li><code><a title="database.Database.addIntervention" href="#database.Database.addIntervention">addIntervention</a></code></li>
 <li><code><a title="database.Database.addMachine" href="#database.Database.addMachine">addMachine</a></code></li>
 <li><code><a title="database.Database.addMachineMaintenance" href="#database.Database.addMachineMaintenance">addMachineMaintenance</a></code></li>
 <li><code><a title="database.Database.addMachineType" href="#database.Database.addMachineType">addMachineType</a></code></li>
@@ -3235,6 +3822,10 @@ Not necessary if id is provided.</dd>
 <li><code><a title="database.Database.dropDatabase" href="#database.Database.dropDatabase">dropDatabase</a></code></li>
 <li><code><a title="database.Database.editMachineTypeName" href="#database.Database.editMachineTypeName">editMachineTypeName</a></code></li>
 <li><code><a title="database.Database.editRoleName" href="#database.Database.editRoleName">editRoleName</a></code></li>
+<li><code><a title="database.Database.getIntervention" href="#database.Database.getIntervention">getIntervention</a></code></li>
+<li><code><a title="database.Database.getInterventionMachine" href="#database.Database.getInterventionMachine">getInterventionMachine</a></code></li>
+<li><code><a title="database.Database.getInterventionTimestamp" href="#database.Database.getInterventionTimestamp">getInterventionTimestamp</a></code></li>
+<li><code><a title="database.Database.getInterventionUser" href="#database.Database.getInterventionUser">getInterventionUser</a></code></li>
 <li><code><a title="database.Database.getMachine" href="#database.Database.getMachine">getMachine</a></code></li>
 <li><code><a title="database.Database.getMachineHours" href="#database.Database.getMachineHours">getMachineHours</a></code></li>
 <li><code><a title="database.Database.getMachineMachineType" href="#database.Database.getMachineMachineType">getMachineMachineType</a></code></li>
@@ -3250,6 +3841,7 @@ Not necessary if id is provided.</dd>
 <li><code><a title="database.Database.getUserCardUUID" href="#database.Database.getUserCardUUID">getUserCardUUID</a></code></li>
 <li><code><a title="database.Database.getUserId" href="#database.Database.getUserId">getUserId</a></code></li>
 <li><code><a title="database.Database.getUserRole" href="#database.Database.getUserRole">getUserRole</a></code></li>
+<li><code><a title="database.Database.listInterventions" href="#database.Database.listInterventions">listInterventions</a></code></li>
 <li><code><a title="database.Database.listMachineTypes" href="#database.Database.listMachineTypes">listMachineTypes</a></code></li>
 <li><code><a title="database.Database.listMachines" href="#database.Database.listMachines">listMachines</a></code></li>
 <li><code><a title="database.Database.listMaintenances" href="#database.Database.listMaintenances">listMaintenances</a></code></li>
