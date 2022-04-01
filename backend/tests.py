@@ -31,10 +31,14 @@ class TestDB(unittest.TestCase):
         d.dropDatabase()
         d = Database("test_settings.toml")
 
-        d.addMachineType(type_id=ids, type_name="drill")
-        d.addRole(role_id=ids, role_name="admin")
+        d.addMachineType(type_id=ids, type_name="type 0")
+        d.addMachineType(type_id=ids + 1, type_name="type 1")
+        d.addRole(role_id=ids, role_name="admin", authorize_all=True)
+        d.addRole(role_id=ids + 1, role_name="user")
         d.addUser(name="Mario", surname="Rossi", role_id=ids)
-        d.addMachine(machine_id=0, machine_name="DRILL0", machine_type=ids)
+        d.addUser(name="Andrea", surname="Bianchi", role_id=ids + 1)
+        d.addMachine(machine_id=ids, machine_name="DRILL0", machine_type=ids)
+        d.addMachine(machine_id=ids + 1, machine_name="DRILL1", machine_type=ids + 1)
         d.addMaintenance(
             maintenance_id=ids, hours_between=10, description="replace engine"
         )
@@ -228,11 +232,49 @@ class TestDB(unittest.TestCase):
         with self.assertRaises(InvalidIdException):
             d.getRole(10)
 
+    def test_get_user_authorizations(self):
+        d = self.populateSimpleDatabase()
+
+        # check the authorization
+        d.setUserAuthorization(0, [0])
+        auth = d.isUserAuthroizedForMachine(machine_id=0, user_id=0)
+        self.assertTrue(auth)
+
+        # add user with UUID
+        card_UUID = "1234567890"
+        d.setUserCardUUID(user_id=1, card_UUID=card_UUID)
+        # test its authorizations
+        d.setUserAuthorization(1, [0])
+        auth = d.isUserAuthroizedForMachine(machine_id=0, card_UUID=card_UUID)
+        self.assertTrue(auth)
+        d.setUserAuthorization(1, [0, 1])
+        auth = d.isUserAuthroizedForMachine(machine_id=1, card_UUID=card_UUID)
+        self.assertTrue(auth)
+        d.setUserAuthorization(1, [])
+        for x in range(2):
+            auth = d.isUserAuthroizedForMachine(machine_id=x, card_UUID=card_UUID)
+            self.assertFalse(auth)
+
+        # test invalid query
+        with self.assertRaises(InvalidQueryException):
+            d.isUserAuthroizedForMachine(machine_id=0)
+        with self.assertRaises(InvalidQueryException):
+            d.isUserAuthroizedForMachine(machine_id=0, card_UUID="LMAO")
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.isUserAuthroizedForMachine(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.isUserAuthroizedForMachine(machine_id=10, user_id=0)
+
     def test_set_authorizations(self):
         d = self.populateSimpleDatabase()
-        d.setUserAuthorization(0, [0])
-        authorization_ids = [t.type_id for t in d.getUserAuthorization(0)]
+        # test user auth
+        d.setUserAuthorization(1, [0])
+        authorization_ids = [t.type_id for t in d.getUserAuthorization(1)]
         self.assertListEqual(authorization_ids, [0])
+        # test admin auth
+        d.setUserAuthorization(0, [])
+        self.assertTrue(d.isUserAuthroizedForMachine(machine_id=0, user_id=0))
 
         # test invalid authorization
         with self.assertRaises(InvalidQueryException):
@@ -466,8 +508,75 @@ class TestDB(unittest.TestCase):
         with self.assertRaises(InvalidIdException):
             d.getInterventionTimestamp(intervention_id=10)
 
-    def test_entity_deserialize(self):
-        pass
+    def test_user_use_interaction(self):
+        d = self.populateSimpleDatabase()
+        d.startUse(machine_id=0, user_id=0, timestamp=time())
+        duration = d.endUse(machine_id=0, user_id=0, timestamp=time() + 1000)
+        self.assertAlmostEqual(duration, 1000, places=2)
+        d.startUse(machine_id=1, user_id=1)
+        duration = d.endUse(machine_id=1, user_id=1)
+        self.assertAlmostEqual(duration, 0, places=2)
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=10, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.endUse(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.endUse(machine_id=10, user_id=0)
+
+        # test end before start
+        with self.assertRaises(InvalidQueryException):
+            d.endUse(machine_id=0, user_id=0)
+
+    def test_use_helpers(self):
+        d = self.populateSimpleDatabase()
+        DURATION = 2 * 3600
+        CARD_UUID = "ABCD1234"
+
+        # test simple use
+        d.startUse(machine_id=0, user_id=0)
+        elapsed = d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+        uses = d.getUserUses(user_id=0)
+        in_use = d.getCurrentlyUsedMachines()
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(len(in_use), 0)
+        self.assertAlmostEqual(elapsed, DURATION, places=2)
+
+        # test total time
+        d.setUserCardUUID(user_id=1, card_UUID=CARD_UUID)
+        d.startUse(machine_id=1, user_id=1)
+        elapsed = d.endUse(machine_id=1, user_id=1, timestamp=time() + DURATION)
+        uses = d.getUserUses(user_id=1)
+        in_use = d.getCurrentlyUsedMachines()
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(len(in_use), 0)
+        self.assertEqual(d.getUserTotalTime(user_id=1), elapsed)
+
+        # test in use
+        d.startUse(machine_id=0, user_id=0)
+        in_use = d.isMachineCurrentlyUsed(machine_id=0)
+        self.assertTrue(in_use)
+        d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+        in_use = d.isMachineCurrentlyUsed(machine_id=0)
+        self.assertFalse(in_use)
+        in_use = d.isMachineCurrentlyUsed(machine_id=1)
+        self.assertFalse(in_use)
+
+        # test start machine that's being used
+        d.startUse(machine_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=0, user_id=1)
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.getUserUses(user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.isMachineCurrentlyUsed(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getUserTotalTime(user_id=10)
 
 
 if __name__ == "__main__":
