@@ -29,7 +29,7 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34;This is the class handling the Database. More to come.&#34;&#34;&#34;
 
-from entities import User, Role, MachineType, Machine, Maintenance, Intervention
+from entities import User, Role, MachineType, Machine, Maintenance, Intervention, Use
 from exceptions import (
     DuplicatedIdException,
     InvalidIdException,
@@ -65,6 +65,7 @@ class Database:
             &#34;machines&#34;: &#34;machine_id&#34;,
             &#34;maintenances&#34;: &#34;maintenance_id&#34;,
             &#34;interventions&#34;: &#34;intervention_id&#34;,
+            &#34;uses&#34;: &#34;use_id&#34;,
         }
 
         self._loadSettings()
@@ -102,12 +103,48 @@ class Database:
         collection = self._db[collection_name]
         return list(collection.find(projection={&#34;_id&#34;: 0}))
 
+    def _getUserIdFromCard(self, card_UUID: str = None) -&gt; int:
+        collection = self._db[&#34;users&#34;]
+        result = collection.find_one({&#34;card_UUID&#34;: card_UUID})
+        return result[&#34;user_id&#34;]
+
+    def _validateRole(self, role_id: int) -&gt; bool:
+        collection = self._db[&#34;roles&#34;]
+        return collection.count_documents({&#34;role_id&#34;: role_id}) == 1
+
+    def _validateMachineType(self, type_id: int) -&gt; bool:
+        collection = self._db[&#34;machine_types&#34;]
+        return collection.count_documents({&#34;type_id&#34;: type_id}) == 1
+
+    def _validateUser(self, user_id: int) -&gt; bool:
+        collection = self._db[&#34;users&#34;]
+        return collection.count_documents({&#34;user_id&#34;: user_id}) == 1
+
+    def _validateMachine(self, machine_id: int) -&gt; bool:
+        collection = self._db[&#34;machines&#34;]
+        return collection.count_documents({&#34;machine_id&#34;: machine_id}) == 1
+
+    def _validateMaintenance(self, maintenance_id: int) -&gt; bool:
+        collection = self._db[&#34;maintenances&#34;]
+        return collection.count_documents({&#34;maintenance_id&#34;: maintenance_id}) == 1
+
+    def _isUserCurrentlyUsing(self, machine_id: int, user_id: int) -&gt; bool:
+        collection = self._db[&#34;uses&#34;]
+        return (
+            collection.count_documents(
+                {&#34;user_id&#34;: user_id, &#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None}
+            )
+            &gt; 0
+        )
+
     def dropDatabase(self) -&gt; None:
         &#34;&#34;&#34;Drop all colletions in database. Needless to say that this is pretty dangerous.&#34;&#34;&#34;
         for c in self._db.list_collection_names():
             self._db.drop_collection(c)
 
-    def addRole(self, role_id: int, role_name: str) -&gt; None:
+    def addRole(
+        self, role_id: int, role_name: str, authorize_all: bool = False
+    ) -&gt; None:
         &#34;&#34;&#34;Add a Role to the database.
 
         Args:
@@ -115,7 +152,7 @@ class Database:
             role_name (str): name of the Role
         &#34;&#34;&#34;
         collection = self._db[&#34;roles&#34;]
-        r = Role(role_id=role_id, role_name=role_name)
+        r = Role(role_id=role_id, role_name=role_name, authorize_all=authorize_all)
 
         try:
             collection.insert_one(r.serialize())
@@ -263,7 +300,7 @@ class Database:
         Returns:
             int: id of the User
         &#34;&#34;&#34;
-        if all(r.role_id != role_id for r in self.listRoles()):
+        if not self._validateRole(role_id=role_id):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -339,7 +376,7 @@ class Database:
             user_id (int): id of the User
             role_id (int): id of the Role
         &#34;&#34;&#34;
-        if all(r.role_id != role_id for r in self.listRoles()):
+        if not self._validateRole(role_id=role_id):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -443,6 +480,9 @@ class Database:
         if result is None:
             raise InvalidIdException(&#34;User&#34;, user_id)
 
+        if not result[&#34;authorization_ids&#34;]:
+            return []
+
         authorizations = []
         for t in self.listMachineTypes():
             if t.type_id in result[&#34;authorization_ids&#34;]:
@@ -501,7 +541,7 @@ class Database:
         &#34;&#34;&#34;
         collection = self._db[&#34;machines&#34;]
 
-        if all(machine_type != t.type_id for t in self.listMachineTypes()):
+        if not self._validateMachineType(type_id=machine_type):
             raise InvalidQueryException(&#34;Machine type&#34;, machine_type)
 
         m = Machine(
@@ -652,14 +692,14 @@ class Database:
             machine_id (int): id of the Machine
             maintenance_id (int): id of the Maintenance
         &#34;&#34;&#34;
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
-
-        if result is None:
-            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         if not result[&#34;maintenances&#34;]:
             collection.update_one(
@@ -700,22 +740,22 @@ class Database:
             machine_id (int): id of the Machine
             maintenance_id (int): id of the Maintenances
         &#34;&#34;&#34;
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
-        if result is None:
+        if len(result[&#34;maintenances&#34;]) == 0:
             raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if not result[&#34;maintenances&#34;]:
-            raise InvalidIdException(&#34;Machine&#34;, machine_id)
-        else:
-            collection.update_one(
-                {&#34;machine_id&#34;: machine_id},
-                {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
-            )
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id},
+            {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
+        )
 
     def addMaintenance(
         self, hours_between: float, description: str = None, maintenance_id: int = None
@@ -882,13 +922,13 @@ class Database:
         Returns:
             int: id of the Intervention
         &#34;&#34;&#34;
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
-        if all(machine_id != m.machine_id for m in self.listMachines()):
+        if not self._validateMachine(machine_id=machine_id):
             raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if all(user_id != u.user_id for u in self.listUsers()):
+        if not self._validateUser(user_id=user_id):
             raise InvalidIdException(&#34;User&#34;, user_id)
 
         if timestamp is None:
@@ -1011,7 +1051,230 @@ class Database:
         if result is None:
             raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
 
-        return result[&#34;timestamp&#34;]</code></pre>
+        return result[&#34;timestamp&#34;]
+
+    def startUse(
+        self,
+        machine_id: int,
+        user_id: int = None,
+        card_UUID: str = None,
+        timestamp: float = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Start use of a Machine for a certain User.
+
+        Args:
+            machine_id (int): id of a Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+            timestamp (float, optional): start timestamp. If not passed, current time will be used
+        &#34;&#34;&#34;
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(
+                &#34;Machine&#34;,
+                machine_id,
+            )
+
+        if self.isMachineCurrentlyUsed(machine_id=machine_id):
+            raise InvalidIdException(
+                &#34;Machine&#34;,
+                machine_id,
+            )
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db[&#34;uses&#34;]
+
+        if collection.count_documents({}) == 0:
+            use_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(collection.find({}).sort(&#34;use_id&#34;, DESCENDING).limit(1))[0]
+            use_id = last[&#34;use_id&#34;] + 1
+
+        u = Use(
+            use_id=use_id,
+            user_id=user_id,
+            machine_id=machine_id,
+            start_timestamp=timestamp,
+        )
+
+        collection.insert_one(u.serialize())
+
+    def endUse(
+        self,
+        machine_id: int,
+        user_id: int = None,
+        card_UUID: str = None,
+        timestamp: float = None,
+    ) -&gt; float:
+        &#34;&#34;&#34;End a use that was previously started.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+            timestamp (float, optional): start timestamp. If not passed, current time will be used
+
+        Returns:
+            float: duration of the Use
+        &#34;&#34;&#34;
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(
+                &#34;Machine&#34;,
+                machine_id,
+            )
+
+        if not self._isUserCurrentlyUsing(machine_id=machine_id, user_id=user_id):
+            raise InvalidQueryException(&#34;User&#34;, user_id)
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db[&#34;uses&#34;]
+        collection.update_one(
+            {&#34;user_id&#34;: user_id, &#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None},
+            {&#34;$set&#34;: {&#34;end_timestamp&#34;: timestamp}},
+        )
+
+        result = collection.find_one({&#34;end_timestamp&#34;: timestamp})
+        return timestamp - result[&#34;start_timestamp&#34;]
+
+    # helper methods
+    def getUserUses(self, user_id: int = None, card_UUID: str = None) -&gt; list[Use]:
+        &#34;&#34;&#34;Return uses from a certain user.
+
+        Args:
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            list[Use]
+        &#34;&#34;&#34;
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        collection = self._db[&#34;uses&#34;]
+        results = collection.find({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
+
+        return [Use.from_dict(r) for r in results]
+
+    def isMachineCurrentlyUsed(self, machine_id: int) -&gt; bool:
+        &#34;&#34;&#34;Return True if the machine is currently being used, False otherwise.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            bool
+        &#34;&#34;&#34;
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
+
+        collection = self._db[&#34;uses&#34;]
+        return (
+            collection.count_documents(
+                {&#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None}
+            )
+            == 1
+        )
+
+    def getCurrentlyUsedMachines(self) -&gt; list[Machine]:
+        &#34;&#34;&#34;Get a list of the Machine that are being used in this moment.
+
+        Returns:
+            list[Machine]
+        &#34;&#34;&#34;
+        collection = self._db[&#34;uses&#34;]
+        results = collection.find({&#34;end_timestamp&#34;: None}, projection={&#34;_id&#34;: 0})
+        return [Machine.from_dict(r[&#34;machine_id&#34;]) for r in results]
+
+    def getUserTotalTime(self, user_id: int) -&gt; float:
+        &#34;&#34;&#34;Return total time the User has used the machines.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            float: User time in seconds
+        &#34;&#34;&#34;
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        collection = self._db[&#34;uses&#34;]
+        uses = collection.find(
+            {&#34;user_id&#34;: user_id, &#34;end_timestamp&#34;: {&#34;$exists&#34;: True, &#34;$ne&#34;: None}}
+        )
+        total = 0
+        for u in uses:
+            total += u[&#34;end_timestamp&#34;] - u[&#34;start_timestamp&#34;]
+        return total
+
+    def isUserAuthroizedForMachine(
+        self, machine_id: int, user_id: int = None, card_UUID: str = None
+    ) -&gt; bool:
+        &#34;&#34;&#34;Return True if a User is authorized to use a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            bool
+        &#34;&#34;&#34;
+        if user_id is None and card_UUID is None:
+            raise InvalidQueryException(&#34;User&#34;, &#34;user id or card UUID&#34;)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine id&#34;, machine_id)
+
+        if user_id is None:
+            user_id = self.getUserFromCardUUID(card_UUID=card_UUID).user_id
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User id&#34;, user_id)
+
+        role = self.getUserRole(user_id)
+        if role.authorize_all:
+            return True
+
+        machine_type = self.getMachineMachineType(machine_id)
+        authorizations = self.getUserAuthorization(user_id)
+
+        return any(a.type_id == machine_type for a in authorizations)
+
+    def getUserFromCardUUID(self, card_UUID: str) -&gt; User:
+        &#34;&#34;&#34;Return user from the UUID of its card.
+
+        Args:
+            card_UUID (str): UUID of the card
+
+        Returns:
+            User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        result = collection.find_one({&#34;card_UUID&#34;: card_UUID}, projection={&#34;_id&#34;: 0})
+
+        if not result:
+            raise InvalidQueryException(&#34;Card UUID&#34;, card_UUID)
+
+        return User.from_dict(result)</code></pre>
 </details>
 </section>
 <section>
@@ -1061,6 +1324,7 @@ class Database:
             &#34;machines&#34;: &#34;machine_id&#34;,
             &#34;maintenances&#34;: &#34;maintenance_id&#34;,
             &#34;interventions&#34;: &#34;intervention_id&#34;,
+            &#34;uses&#34;: &#34;use_id&#34;,
         }
 
         self._loadSettings()
@@ -1098,12 +1362,48 @@ class Database:
         collection = self._db[collection_name]
         return list(collection.find(projection={&#34;_id&#34;: 0}))
 
+    def _getUserIdFromCard(self, card_UUID: str = None) -&gt; int:
+        collection = self._db[&#34;users&#34;]
+        result = collection.find_one({&#34;card_UUID&#34;: card_UUID})
+        return result[&#34;user_id&#34;]
+
+    def _validateRole(self, role_id: int) -&gt; bool:
+        collection = self._db[&#34;roles&#34;]
+        return collection.count_documents({&#34;role_id&#34;: role_id}) == 1
+
+    def _validateMachineType(self, type_id: int) -&gt; bool:
+        collection = self._db[&#34;machine_types&#34;]
+        return collection.count_documents({&#34;type_id&#34;: type_id}) == 1
+
+    def _validateUser(self, user_id: int) -&gt; bool:
+        collection = self._db[&#34;users&#34;]
+        return collection.count_documents({&#34;user_id&#34;: user_id}) == 1
+
+    def _validateMachine(self, machine_id: int) -&gt; bool:
+        collection = self._db[&#34;machines&#34;]
+        return collection.count_documents({&#34;machine_id&#34;: machine_id}) == 1
+
+    def _validateMaintenance(self, maintenance_id: int) -&gt; bool:
+        collection = self._db[&#34;maintenances&#34;]
+        return collection.count_documents({&#34;maintenance_id&#34;: maintenance_id}) == 1
+
+    def _isUserCurrentlyUsing(self, machine_id: int, user_id: int) -&gt; bool:
+        collection = self._db[&#34;uses&#34;]
+        return (
+            collection.count_documents(
+                {&#34;user_id&#34;: user_id, &#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None}
+            )
+            &gt; 0
+        )
+
     def dropDatabase(self) -&gt; None:
         &#34;&#34;&#34;Drop all colletions in database. Needless to say that this is pretty dangerous.&#34;&#34;&#34;
         for c in self._db.list_collection_names():
             self._db.drop_collection(c)
 
-    def addRole(self, role_id: int, role_name: str) -&gt; None:
+    def addRole(
+        self, role_id: int, role_name: str, authorize_all: bool = False
+    ) -&gt; None:
         &#34;&#34;&#34;Add a Role to the database.
 
         Args:
@@ -1111,7 +1411,7 @@ class Database:
             role_name (str): name of the Role
         &#34;&#34;&#34;
         collection = self._db[&#34;roles&#34;]
-        r = Role(role_id=role_id, role_name=role_name)
+        r = Role(role_id=role_id, role_name=role_name, authorize_all=authorize_all)
 
         try:
             collection.insert_one(r.serialize())
@@ -1259,7 +1559,7 @@ class Database:
         Returns:
             int: id of the User
         &#34;&#34;&#34;
-        if all(r.role_id != role_id for r in self.listRoles()):
+        if not self._validateRole(role_id=role_id):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -1335,7 +1635,7 @@ class Database:
             user_id (int): id of the User
             role_id (int): id of the Role
         &#34;&#34;&#34;
-        if all(r.role_id != role_id for r in self.listRoles()):
+        if not self._validateRole(role_id=role_id):
             raise InvalidIdException(&#34;Role id&#34;, role_id)
 
         collection = self._db[&#34;users&#34;]
@@ -1439,6 +1739,9 @@ class Database:
         if result is None:
             raise InvalidIdException(&#34;User&#34;, user_id)
 
+        if not result[&#34;authorization_ids&#34;]:
+            return []
+
         authorizations = []
         for t in self.listMachineTypes():
             if t.type_id in result[&#34;authorization_ids&#34;]:
@@ -1497,7 +1800,7 @@ class Database:
         &#34;&#34;&#34;
         collection = self._db[&#34;machines&#34;]
 
-        if all(machine_type != t.type_id for t in self.listMachineTypes()):
+        if not self._validateMachineType(type_id=machine_type):
             raise InvalidQueryException(&#34;Machine type&#34;, machine_type)
 
         m = Machine(
@@ -1648,14 +1951,14 @@ class Database:
             machine_id (int): id of the Machine
             maintenance_id (int): id of the Maintenance
         &#34;&#34;&#34;
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
-
-        if result is None:
-            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         if not result[&#34;maintenances&#34;]:
             collection.update_one(
@@ -1696,22 +1999,22 @@ class Database:
             machine_id (int): id of the Machine
             maintenance_id (int): id of the Maintenances
         &#34;&#34;&#34;
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
         collection = self._db[&#34;machines&#34;]
         result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
-        if result is None:
+        if len(result[&#34;maintenances&#34;]) == 0:
             raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if not result[&#34;maintenances&#34;]:
-            raise InvalidIdException(&#34;Machine&#34;, machine_id)
-        else:
-            collection.update_one(
-                {&#34;machine_id&#34;: machine_id},
-                {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
-            )
+        collection.update_one(
+            {&#34;machine_id&#34;: machine_id},
+            {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
+        )
 
     def addMaintenance(
         self, hours_between: float, description: str = None, maintenance_id: int = None
@@ -1878,13 +2181,13 @@ class Database:
         Returns:
             int: id of the Intervention
         &#34;&#34;&#34;
-        if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+        if not self._validateMaintenance(maintenance_id=maintenance_id):
             raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
-        if all(machine_id != m.machine_id for m in self.listMachines()):
+        if not self._validateMachine(machine_id=machine_id):
             raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-        if all(user_id != u.user_id for u in self.listUsers()):
+        if not self._validateUser(user_id=user_id):
             raise InvalidIdException(&#34;User&#34;, user_id)
 
         if timestamp is None:
@@ -2007,7 +2310,230 @@ class Database:
         if result is None:
             raise InvalidIdException(&#34;Intervention&#34;, intervention_id)
 
-        return result[&#34;timestamp&#34;]</code></pre>
+        return result[&#34;timestamp&#34;]
+
+    def startUse(
+        self,
+        machine_id: int,
+        user_id: int = None,
+        card_UUID: str = None,
+        timestamp: float = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Start use of a Machine for a certain User.
+
+        Args:
+            machine_id (int): id of a Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+            timestamp (float, optional): start timestamp. If not passed, current time will be used
+        &#34;&#34;&#34;
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(
+                &#34;Machine&#34;,
+                machine_id,
+            )
+
+        if self.isMachineCurrentlyUsed(machine_id=machine_id):
+            raise InvalidIdException(
+                &#34;Machine&#34;,
+                machine_id,
+            )
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db[&#34;uses&#34;]
+
+        if collection.count_documents({}) == 0:
+            use_id = 0
+        else:
+            # find the highest User id and add 1
+            last = list(collection.find({}).sort(&#34;use_id&#34;, DESCENDING).limit(1))[0]
+            use_id = last[&#34;use_id&#34;] + 1
+
+        u = Use(
+            use_id=use_id,
+            user_id=user_id,
+            machine_id=machine_id,
+            start_timestamp=timestamp,
+        )
+
+        collection.insert_one(u.serialize())
+
+    def endUse(
+        self,
+        machine_id: int,
+        user_id: int = None,
+        card_UUID: str = None,
+        timestamp: float = None,
+    ) -&gt; float:
+        &#34;&#34;&#34;End a use that was previously started.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+            timestamp (float, optional): start timestamp. If not passed, current time will be used
+
+        Returns:
+            float: duration of the Use
+        &#34;&#34;&#34;
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(
+                &#34;Machine&#34;,
+                machine_id,
+            )
+
+        if not self._isUserCurrentlyUsing(machine_id=machine_id, user_id=user_id):
+            raise InvalidQueryException(&#34;User&#34;, user_id)
+
+        if timestamp is None:
+            timestamp = time()
+
+        collection = self._db[&#34;uses&#34;]
+        collection.update_one(
+            {&#34;user_id&#34;: user_id, &#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None},
+            {&#34;$set&#34;: {&#34;end_timestamp&#34;: timestamp}},
+        )
+
+        result = collection.find_one({&#34;end_timestamp&#34;: timestamp})
+        return timestamp - result[&#34;start_timestamp&#34;]
+
+    # helper methods
+    def getUserUses(self, user_id: int = None, card_UUID: str = None) -&gt; list[Use]:
+        &#34;&#34;&#34;Return uses from a certain user.
+
+        Args:
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            list[Use]
+        &#34;&#34;&#34;
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        collection = self._db[&#34;uses&#34;]
+        results = collection.find({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
+
+        return [Use.from_dict(r) for r in results]
+
+    def isMachineCurrentlyUsed(self, machine_id: int) -&gt; bool:
+        &#34;&#34;&#34;Return True if the machine is currently being used, False otherwise.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            bool
+        &#34;&#34;&#34;
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine&#34;, machine_id)
+
+        collection = self._db[&#34;uses&#34;]
+        return (
+            collection.count_documents(
+                {&#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None}
+            )
+            == 1
+        )
+
+    def getCurrentlyUsedMachines(self) -&gt; list[Machine]:
+        &#34;&#34;&#34;Get a list of the Machine that are being used in this moment.
+
+        Returns:
+            list[Machine]
+        &#34;&#34;&#34;
+        collection = self._db[&#34;uses&#34;]
+        results = collection.find({&#34;end_timestamp&#34;: None}, projection={&#34;_id&#34;: 0})
+        return [Machine.from_dict(r[&#34;machine_id&#34;]) for r in results]
+
+    def getUserTotalTime(self, user_id: int) -&gt; float:
+        &#34;&#34;&#34;Return total time the User has used the machines.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            float: User time in seconds
+        &#34;&#34;&#34;
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User&#34;, user_id)
+
+        collection = self._db[&#34;uses&#34;]
+        uses = collection.find(
+            {&#34;user_id&#34;: user_id, &#34;end_timestamp&#34;: {&#34;$exists&#34;: True, &#34;$ne&#34;: None}}
+        )
+        total = 0
+        for u in uses:
+            total += u[&#34;end_timestamp&#34;] - u[&#34;start_timestamp&#34;]
+        return total
+
+    def isUserAuthroizedForMachine(
+        self, machine_id: int, user_id: int = None, card_UUID: str = None
+    ) -&gt; bool:
+        &#34;&#34;&#34;Return True if a User is authorized to use a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            bool
+        &#34;&#34;&#34;
+        if user_id is None and card_UUID is None:
+            raise InvalidQueryException(&#34;User&#34;, &#34;user id or card UUID&#34;)
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException(&#34;Machine id&#34;, machine_id)
+
+        if user_id is None:
+            user_id = self.getUserFromCardUUID(card_UUID=card_UUID).user_id
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException(&#34;User id&#34;, user_id)
+
+        role = self.getUserRole(user_id)
+        if role.authorize_all:
+            return True
+
+        machine_type = self.getMachineMachineType(machine_id)
+        authorizations = self.getUserAuthorization(user_id)
+
+        return any(a.type_id == machine_type for a in authorizations)
+
+    def getUserFromCardUUID(self, card_UUID: str) -&gt; User:
+        &#34;&#34;&#34;Return user from the UUID of its card.
+
+        Args:
+            card_UUID (str): UUID of the card
+
+        Returns:
+            User
+        &#34;&#34;&#34;
+        collection = self._db[&#34;users&#34;]
+        result = collection.find_one({&#34;card_UUID&#34;: card_UUID}, projection={&#34;_id&#34;: 0})
+
+        if not result:
+            raise InvalidQueryException(&#34;Card UUID&#34;, card_UUID)
+
+        return User.from_dict(result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -2056,13 +2582,13 @@ If not provided, current time is used</dd>
     Returns:
         int: id of the Intervention
     &#34;&#34;&#34;
-    if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+    if not self._validateMaintenance(maintenance_id=maintenance_id):
         raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
 
-    if all(machine_id != m.machine_id for m in self.listMachines()):
+    if not self._validateMachine(machine_id=machine_id):
         raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-    if all(user_id != u.user_id for u in self.listUsers()):
+    if not self._validateUser(user_id=user_id):
         raise InvalidIdException(&#34;User&#34;, user_id)
 
     if timestamp is None:
@@ -2128,7 +2654,7 @@ If not provided, current time is used</dd>
     &#34;&#34;&#34;
     collection = self._db[&#34;machines&#34;]
 
-    if all(machine_type != t.type_id for t in self.listMachineTypes()):
+    if not self._validateMachineType(type_id=machine_type):
         raise InvalidQueryException(&#34;Machine type&#34;, machine_type)
 
     m = Machine(
@@ -2167,14 +2693,14 @@ If not provided, current time is used</dd>
         machine_id (int): id of the Machine
         maintenance_id (int): id of the Maintenance
     &#34;&#34;&#34;
-    if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+    if not self._validateMaintenance(maintenance_id=maintenance_id):
         raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+    if not self._validateMachine(machine_id=machine_id):
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     collection = self._db[&#34;machines&#34;]
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
-
-    if result is None:
-        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     if not result[&#34;maintenances&#34;]:
         collection.update_one(
@@ -2285,7 +2811,7 @@ not passed.</dd>
 </details>
 </dd>
 <dt id="database.Database.addRole"><code class="name flex">
-<span>def <span class="ident">addRole</span></span>(<span>self, role_id: int, role_name: str) ‑> None</span>
+<span>def <span class="ident">addRole</span></span>(<span>self, role_id: int, role_name: str, authorize_all: bool = False) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Add a Role to the database.</p>
@@ -2300,7 +2826,9 @@ not passed.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def addRole(self, role_id: int, role_name: str) -&gt; None:
+<pre><code class="python">def addRole(
+    self, role_id: int, role_name: str, authorize_all: bool = False
+) -&gt; None:
     &#34;&#34;&#34;Add a Role to the database.
 
     Args:
@@ -2308,7 +2836,7 @@ not passed.</dd>
         role_name (str): name of the Role
     &#34;&#34;&#34;
     collection = self._db[&#34;roles&#34;]
-    r = Role(role_id=role_id, role_name=role_name)
+    r = Role(role_id=role_id, role_name=role_name, authorize_all=authorize_all)
 
     try:
         collection.insert_one(r.serialize())
@@ -2363,7 +2891,7 @@ not passed.</dd>
     Returns:
         int: id of the User
     &#34;&#34;&#34;
-    if all(r.role_id != role_id for r in self.listRoles()):
+    if not self._validateRole(role_id=role_id):
         raise InvalidIdException(&#34;Role id&#34;, role_id)
 
     collection = self._db[&#34;users&#34;]
@@ -2464,6 +2992,99 @@ not passed.</dd>
     collection.update_one(
         {&#34;role_id&#34;: role_id}, {&#34;$set&#34;: {&#34;role_name&#34;: r.role_name}}
     )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.endUse"><code class="name flex">
+<span>def <span class="ident">endUse</span></span>(<span>self, machine_id: int, user_id: int = None, card_UUID: str = None, timestamp: float = None) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>End a use that was previously started.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of a User. Not necessary if card_UUID is passed</dd>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>card_UUID of a User. Not necessary if user_id is passed</dd>
+<dt><strong><code>timestamp</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>start timestamp. If not passed, current time will be used</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>duration of the Use</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def endUse(
+    self,
+    machine_id: int,
+    user_id: int = None,
+    card_UUID: str = None,
+    timestamp: float = None,
+) -&gt; float:
+    &#34;&#34;&#34;End a use that was previously started.
+
+    Args:
+        machine_id (int): id of the Machine
+        user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+        card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+        timestamp (float, optional): start timestamp. If not passed, current time will be used
+
+    Returns:
+        float: duration of the Use
+    &#34;&#34;&#34;
+    if not user_id:
+        user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+    if not self._validateUser(user_id=user_id):
+        raise InvalidIdException(&#34;User&#34;, user_id)
+
+    if not self._validateMachine(machine_id=machine_id):
+        raise InvalidIdException(
+            &#34;Machine&#34;,
+            machine_id,
+        )
+
+    if not self._isUserCurrentlyUsing(machine_id=machine_id, user_id=user_id):
+        raise InvalidQueryException(&#34;User&#34;, user_id)
+
+    if timestamp is None:
+        timestamp = time()
+
+    collection = self._db[&#34;uses&#34;]
+    collection.update_one(
+        {&#34;user_id&#34;: user_id, &#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None},
+        {&#34;$set&#34;: {&#34;end_timestamp&#34;: timestamp}},
+    )
+
+    result = collection.find_one({&#34;end_timestamp&#34;: timestamp})
+    return timestamp - result[&#34;start_timestamp&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getCurrentlyUsedMachines"><code class="name flex">
+<span>def <span class="ident">getCurrentlyUsedMachines</span></span>(<span>self) ‑> list[<a title="entities.Machine" href="entities.html#entities.Machine">Machine</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a list of the Machine that are being used in this moment.</p>
+<h2 id="returns">Returns</h2>
+<p>list[Machine]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getCurrentlyUsedMachines(self) -&gt; list[Machine]:
+    &#34;&#34;&#34;Get a list of the Machine that are being used in this moment.
+
+    Returns:
+        list[Machine]
+    &#34;&#34;&#34;
+    collection = self._db[&#34;uses&#34;]
+    results = collection.find({&#34;end_timestamp&#34;: None}, projection={&#34;_id&#34;: 0})
+    return [Machine.from_dict(r[&#34;machine_id&#34;]) for r in results]</code></pre>
 </details>
 </dd>
 <dt id="database.Database.getIntervention"><code class="name flex">
@@ -3100,6 +3721,9 @@ Not necessary if id is provided.</dd>
     if result is None:
         raise InvalidIdException(&#34;User&#34;, user_id)
 
+    if not result[&#34;authorization_ids&#34;]:
+        return []
+
     authorizations = []
     for t in self.listMachineTypes():
         if t.type_id in result[&#34;authorization_ids&#34;]:
@@ -3146,6 +3770,40 @@ Not necessary if id is provided.</dd>
         raise InvalidIdException(&#34;User&#34;, user_id)
 
     return result[&#34;card_UUID&#34;]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserFromCardUUID"><code class="name flex">
+<span>def <span class="ident">getUserFromCardUUID</span></span>(<span>self, card_UUID: str) ‑> <a title="entities.User" href="entities.html#entities.User">User</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return user from the UUID of its card.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code></dt>
+<dd>UUID of the card</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>User</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserFromCardUUID(self, card_UUID: str) -&gt; User:
+    &#34;&#34;&#34;Return user from the UUID of its card.
+
+    Args:
+        card_UUID (str): UUID of the card
+
+    Returns:
+        User
+    &#34;&#34;&#34;
+    collection = self._db[&#34;users&#34;]
+    result = collection.find_one({&#34;card_UUID&#34;: card_UUID}, projection={&#34;_id&#34;: 0})
+
+    if not result:
+        raise InvalidQueryException(&#34;Card UUID&#34;, card_UUID)
+
+    return User.from_dict(result)</code></pre>
 </details>
 </dd>
 <dt id="database.Database.getUserId"><code class="name flex">
@@ -3227,6 +3885,179 @@ Not necessary if id is provided.</dd>
     for r in self.listRoles():
         if r.role_id == result[&#34;role_id&#34;]:
             return r</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserTotalTime"><code class="name flex">
+<span>def <span class="ident">getUserTotalTime</span></span>(<span>self, user_id: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return total time the User has used the machines.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the User</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>User time in seconds</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserTotalTime(self, user_id: int) -&gt; float:
+    &#34;&#34;&#34;Return total time the User has used the machines.
+
+    Args:
+        user_id (int): id of the User
+
+    Returns:
+        float: User time in seconds
+    &#34;&#34;&#34;
+    if not self._validateUser(user_id=user_id):
+        raise InvalidIdException(&#34;User&#34;, user_id)
+
+    collection = self._db[&#34;uses&#34;]
+    uses = collection.find(
+        {&#34;user_id&#34;: user_id, &#34;end_timestamp&#34;: {&#34;$exists&#34;: True, &#34;$ne&#34;: None}}
+    )
+    total = 0
+    for u in uses:
+        total += u[&#34;end_timestamp&#34;] - u[&#34;start_timestamp&#34;]
+    return total</code></pre>
+</details>
+</dd>
+<dt id="database.Database.getUserUses"><code class="name flex">
+<span>def <span class="ident">getUserUses</span></span>(<span>self, user_id: int = None, card_UUID: str = None) ‑> list[<a title="entities.Use" href="entities.html#entities.Use">Use</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return uses from a certain user.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of a User. Not necessary if card_UUID is passed</dd>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>card_UUID of a User. Not necessary if user_id is passed</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>list[Use]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getUserUses(self, user_id: int = None, card_UUID: str = None) -&gt; list[Use]:
+    &#34;&#34;&#34;Return uses from a certain user.
+
+    Args:
+        user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+        card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+    Returns:
+        list[Use]
+    &#34;&#34;&#34;
+    if not user_id:
+        user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+    if not self._validateUser(user_id=user_id):
+        raise InvalidIdException(&#34;User&#34;, user_id)
+
+    collection = self._db[&#34;uses&#34;]
+    results = collection.find({&#34;user_id&#34;: user_id}, projection={&#34;_id&#34;: 0})
+
+    return [Use.from_dict(r) for r in results]</code></pre>
+</details>
+</dd>
+<dt id="database.Database.isMachineCurrentlyUsed"><code class="name flex">
+<span>def <span class="ident">isMachineCurrentlyUsed</span></span>(<span>self, machine_id: int) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return True if the machine is currently being used, False otherwise.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>bool</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def isMachineCurrentlyUsed(self, machine_id: int) -&gt; bool:
+    &#34;&#34;&#34;Return True if the machine is currently being used, False otherwise.
+
+    Args:
+        machine_id (int): id of the Machine
+
+    Returns:
+        bool
+    &#34;&#34;&#34;
+    if not self._validateMachine(machine_id=machine_id):
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
+
+    collection = self._db[&#34;uses&#34;]
+    return (
+        collection.count_documents(
+            {&#34;machine_id&#34;: machine_id, &#34;end_timestamp&#34;: None}
+        )
+        == 1
+    )</code></pre>
+</details>
+</dd>
+<dt id="database.Database.isUserAuthroizedForMachine"><code class="name flex">
+<span>def <span class="ident">isUserAuthroizedForMachine</span></span>(<span>self, machine_id: int, user_id: int = None, card_UUID: str = None) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return True if a User is authorized to use a Machine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of the Machine</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of a User. Not necessary if card_UUID is passed</dd>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>card_UUID of a User. Not necessary if user_id is passed</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>bool</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def isUserAuthroizedForMachine(
+    self, machine_id: int, user_id: int = None, card_UUID: str = None
+) -&gt; bool:
+    &#34;&#34;&#34;Return True if a User is authorized to use a Machine.
+
+    Args:
+        machine_id (int): id of the Machine
+        user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+        card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+    Returns:
+        bool
+    &#34;&#34;&#34;
+    if user_id is None and card_UUID is None:
+        raise InvalidQueryException(&#34;User&#34;, &#34;user id or card UUID&#34;)
+
+    if not self._validateMachine(machine_id=machine_id):
+        raise InvalidIdException(&#34;Machine id&#34;, machine_id)
+
+    if user_id is None:
+        user_id = self.getUserFromCardUUID(card_UUID=card_UUID).user_id
+
+    if not self._validateUser(user_id=user_id):
+        raise InvalidIdException(&#34;User id&#34;, user_id)
+
+    role = self.getUserRole(user_id)
+    if role.authorize_all:
+        return True
+
+    machine_type = self.getMachineMachineType(machine_id)
+    authorizations = self.getUserAuthorization(user_id)
+
+    return any(a.type_id == machine_type for a in authorizations)</code></pre>
 </details>
 </dd>
 <dt id="database.Database.listInterventions"><code class="name flex">
@@ -3415,22 +4246,22 @@ Not necessary if id is provided.</dd>
         machine_id (int): id of the Machine
         maintenance_id (int): id of the Maintenances
     &#34;&#34;&#34;
-    if all(maintenance_id != m.maintenance_id for m in self.listMaintenances()):
+    if not self._validateMaintenance(maintenance_id=maintenance_id):
         raise InvalidIdException(&#34;Maintenance&#34;, maintenance_id)
+
+    if not self._validateMachine(machine_id=machine_id):
+        raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
     collection = self._db[&#34;machines&#34;]
     result = collection.find_one({&#34;machine_id&#34;: machine_id})
 
-    if result is None:
+    if len(result[&#34;maintenances&#34;]) == 0:
         raise InvalidIdException(&#34;Machine&#34;, machine_id)
 
-    if not result[&#34;maintenances&#34;]:
-        raise InvalidIdException(&#34;Machine&#34;, machine_id)
-    else:
-        collection.update_one(
-            {&#34;machine_id&#34;: machine_id},
-            {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
-        )</code></pre>
+    collection.update_one(
+        {&#34;machine_id&#34;: machine_id},
+        {&#34;$pull&#34;: {&#34;maintenances&#34;: maintenance_id}},
+    )</code></pre>
 </details>
 </dd>
 <dt id="database.Database.removeMachineType"><code class="name flex">
@@ -3789,11 +4620,86 @@ Not necessary if id is provided.</dd>
         user_id (int): id of the User
         role_id (int): id of the Role
     &#34;&#34;&#34;
-    if all(r.role_id != role_id for r in self.listRoles()):
+    if not self._validateRole(role_id=role_id):
         raise InvalidIdException(&#34;Role id&#34;, role_id)
 
     collection = self._db[&#34;users&#34;]
     collection.update_one({&#34;user_id&#34;: user_id}, {&#34;$set&#34;: {&#34;role_id&#34;: role_id}})</code></pre>
+</details>
+</dd>
+<dt id="database.Database.startUse"><code class="name flex">
+<span>def <span class="ident">startUse</span></span>(<span>self, machine_id: int, user_id: int = None, card_UUID: str = None, timestamp: float = None) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start use of a Machine for a certain User.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>machine_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>id of a Machine</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>id of a User. Not necessary if card_UUID is passed</dd>
+<dt><strong><code>card_UUID</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>card_UUID of a User. Not necessary if user_id is passed</dd>
+<dt><strong><code>timestamp</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>start timestamp. If not passed, current time will be used</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def startUse(
+    self,
+    machine_id: int,
+    user_id: int = None,
+    card_UUID: str = None,
+    timestamp: float = None,
+) -&gt; None:
+    &#34;&#34;&#34;Start use of a Machine for a certain User.
+
+    Args:
+        machine_id (int): id of a Machine
+        user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+        card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+        timestamp (float, optional): start timestamp. If not passed, current time will be used
+    &#34;&#34;&#34;
+    if not user_id:
+        user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+    if not self._validateUser(user_id=user_id):
+        raise InvalidIdException(&#34;User&#34;, user_id)
+
+    if not self._validateMachine(machine_id=machine_id):
+        raise InvalidIdException(
+            &#34;Machine&#34;,
+            machine_id,
+        )
+
+    if self.isMachineCurrentlyUsed(machine_id=machine_id):
+        raise InvalidIdException(
+            &#34;Machine&#34;,
+            machine_id,
+        )
+
+    if timestamp is None:
+        timestamp = time()
+
+    collection = self._db[&#34;uses&#34;]
+
+    if collection.count_documents({}) == 0:
+        use_id = 0
+    else:
+        # find the highest User id and add 1
+        last = list(collection.find({}).sort(&#34;use_id&#34;, DESCENDING).limit(1))[0]
+        use_id = last[&#34;use_id&#34;] + 1
+
+    u = Use(
+        use_id=use_id,
+        user_id=user_id,
+        machine_id=machine_id,
+        start_timestamp=timestamp,
+    )
+
+    collection.insert_one(u.serialize())</code></pre>
 </details>
 </dd>
 </dl>
@@ -3822,6 +4728,8 @@ Not necessary if id is provided.</dd>
 <li><code><a title="database.Database.dropDatabase" href="#database.Database.dropDatabase">dropDatabase</a></code></li>
 <li><code><a title="database.Database.editMachineTypeName" href="#database.Database.editMachineTypeName">editMachineTypeName</a></code></li>
 <li><code><a title="database.Database.editRoleName" href="#database.Database.editRoleName">editRoleName</a></code></li>
+<li><code><a title="database.Database.endUse" href="#database.Database.endUse">endUse</a></code></li>
+<li><code><a title="database.Database.getCurrentlyUsedMachines" href="#database.Database.getCurrentlyUsedMachines">getCurrentlyUsedMachines</a></code></li>
 <li><code><a title="database.Database.getIntervention" href="#database.Database.getIntervention">getIntervention</a></code></li>
 <li><code><a title="database.Database.getInterventionMachine" href="#database.Database.getInterventionMachine">getInterventionMachine</a></code></li>
 <li><code><a title="database.Database.getInterventionTimestamp" href="#database.Database.getInterventionTimestamp">getInterventionTimestamp</a></code></li>
@@ -3839,8 +4747,13 @@ Not necessary if id is provided.</dd>
 <li><code><a title="database.Database.getUser" href="#database.Database.getUser">getUser</a></code></li>
 <li><code><a title="database.Database.getUserAuthorization" href="#database.Database.getUserAuthorization">getUserAuthorization</a></code></li>
 <li><code><a title="database.Database.getUserCardUUID" href="#database.Database.getUserCardUUID">getUserCardUUID</a></code></li>
+<li><code><a title="database.Database.getUserFromCardUUID" href="#database.Database.getUserFromCardUUID">getUserFromCardUUID</a></code></li>
 <li><code><a title="database.Database.getUserId" href="#database.Database.getUserId">getUserId</a></code></li>
 <li><code><a title="database.Database.getUserRole" href="#database.Database.getUserRole">getUserRole</a></code></li>
+<li><code><a title="database.Database.getUserTotalTime" href="#database.Database.getUserTotalTime">getUserTotalTime</a></code></li>
+<li><code><a title="database.Database.getUserUses" href="#database.Database.getUserUses">getUserUses</a></code></li>
+<li><code><a title="database.Database.isMachineCurrentlyUsed" href="#database.Database.isMachineCurrentlyUsed">isMachineCurrentlyUsed</a></code></li>
+<li><code><a title="database.Database.isUserAuthroizedForMachine" href="#database.Database.isUserAuthroizedForMachine">isUserAuthroizedForMachine</a></code></li>
 <li><code><a title="database.Database.listInterventions" href="#database.Database.listInterventions">listInterventions</a></code></li>
 <li><code><a title="database.Database.listMachineTypes" href="#database.Database.listMachineTypes">listMachineTypes</a></code></li>
 <li><code><a title="database.Database.listMachines" href="#database.Database.listMachines">listMachines</a></code></li>
@@ -3861,6 +4774,7 @@ Not necessary if id is provided.</dd>
 <li><code><a title="database.Database.setUserCardUUID" href="#database.Database.setUserCardUUID">setUserCardUUID</a></code></li>
 <li><code><a title="database.Database.setUserId" href="#database.Database.setUserId">setUserId</a></code></li>
 <li><code><a title="database.Database.setUserRole" href="#database.Database.setUserRole">setUserRole</a></code></li>
+<li><code><a title="database.Database.startUse" href="#database.Database.startUse">startUse</a></code></li>
 </ul>
 </li>
 </ul>

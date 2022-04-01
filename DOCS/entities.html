@@ -63,6 +63,7 @@ class Role(Serializer):
 
     role_id: int
     role_name: str
+    authorize_all: bool = False
 
 
 @dataclass
@@ -117,16 +118,15 @@ class Machine(Serializer):
     interventions: list[Intervention] = None
 
 
-# ! not implemented yet
 @dataclass
-class Usage(Serializer):
-    &#34;&#34;&#34;Dataclass handling a use.&#34;&#34;&#34;
+class Use(Serializer):
+    &#34;&#34;&#34;Dataclass handling machine use.&#34;&#34;&#34;
 
+    use_id: int
     user_id: int
     machine_id: int
-    started_timestamp: float
-    ended_timestamp: float
-    duration: float</code></pre>
+    start_timestamp: float
+    end_timestamp: float = None</code></pre>
 </details>
 </section>
 <section>
@@ -348,7 +348,7 @@ class Maintenance(Serializer):
 </dd>
 <dt id="entities.Role"><code class="flex name class">
 <span>class <span class="ident">Role</span></span>
-<span>(</span><span>role_id: int, role_name: str)</span>
+<span>(</span><span>role_id: int, role_name: str, authorize_all: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Dataclass handling a role.</p></div>
@@ -361,7 +361,8 @@ class Role(Serializer):
     &#34;&#34;&#34;Dataclass handling a role.&#34;&#34;&#34;
 
     role_id: int
-    role_name: str</code></pre>
+    role_name: str
+    authorize_all: bool = False</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -369,6 +370,10 @@ class Role(Serializer):
 </ul>
 <h3>Class variables</h3>
 <dl>
+<dt id="entities.Role.authorize_all"><code class="name">var <span class="ident">authorize_all</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="entities.Role.role_id"><code class="name">var <span class="ident">role_id</span> : int</code></dt>
 <dd>
 <div class="desc"></div>
@@ -427,7 +432,7 @@ class Role(Serializer):
 <li><a title="entities.MachineType" href="#entities.MachineType">MachineType</a></li>
 <li><a title="entities.Maintenance" href="#entities.Maintenance">Maintenance</a></li>
 <li><a title="entities.Role" href="#entities.Role">Role</a></li>
-<li><a title="entities.Usage" href="#entities.Usage">Usage</a></li>
+<li><a title="entities.Use" href="#entities.Use">Use</a></li>
 <li><a title="entities.User" href="#entities.User">User</a></li>
 </ul>
 <h3>Static methods</h3>
@@ -489,25 +494,25 @@ def from_dict(cls, dict_data: dict) -&gt; object:
 </dd>
 </dl>
 </dd>
-<dt id="entities.Usage"><code class="flex name class">
-<span>class <span class="ident">Usage</span></span>
-<span>(</span><span>user_id: int, machine_id: int, started_timestamp: float, ended_timestamp: float, duration: float)</span>
+<dt id="entities.Use"><code class="flex name class">
+<span>class <span class="ident">Use</span></span>
+<span>(</span><span>use_id: int, user_id: int, machine_id: int, start_timestamp: float, end_timestamp: float = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Dataclass handling a use.</p></div>
+<div class="desc"><p>Dataclass handling machine use.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@dataclass
-class Usage(Serializer):
-    &#34;&#34;&#34;Dataclass handling a use.&#34;&#34;&#34;
+class Use(Serializer):
+    &#34;&#34;&#34;Dataclass handling machine use.&#34;&#34;&#34;
 
+    use_id: int
     user_id: int
     machine_id: int
-    started_timestamp: float
-    ended_timestamp: float
-    duration: float</code></pre>
+    start_timestamp: float
+    end_timestamp: float = None</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -515,23 +520,23 @@ class Usage(Serializer):
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="entities.Usage.duration"><code class="name">var <span class="ident">duration</span> : float</code></dt>
+<dt id="entities.Use.end_timestamp"><code class="name">var <span class="ident">end_timestamp</span> : float</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="entities.Usage.ended_timestamp"><code class="name">var <span class="ident">ended_timestamp</span> : float</code></dt>
+<dt id="entities.Use.machine_id"><code class="name">var <span class="ident">machine_id</span> : int</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="entities.Usage.machine_id"><code class="name">var <span class="ident">machine_id</span> : int</code></dt>
+<dt id="entities.Use.start_timestamp"><code class="name">var <span class="ident">start_timestamp</span> : float</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="entities.Usage.started_timestamp"><code class="name">var <span class="ident">started_timestamp</span> : float</code></dt>
+<dt id="entities.Use.use_id"><code class="name">var <span class="ident">use_id</span> : int</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="entities.Usage.user_id"><code class="name">var <span class="ident">user_id</span> : int</code></dt>
+<dt id="entities.Use.user_id"><code class="name">var <span class="ident">user_id</span> : int</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -658,6 +663,7 @@ class User(Serializer):
 <li>
 <h4><code><a title="entities.Role" href="#entities.Role">Role</a></code></h4>
 <ul class="">
+<li><code><a title="entities.Role.authorize_all" href="#entities.Role.authorize_all">authorize_all</a></code></li>
 <li><code><a title="entities.Role.role_id" href="#entities.Role.role_id">role_id</a></code></li>
 <li><code><a title="entities.Role.role_name" href="#entities.Role.role_name">role_name</a></code></li>
 </ul>
@@ -670,13 +676,13 @@ class User(Serializer):
 </ul>
 </li>
 <li>
-<h4><code><a title="entities.Usage" href="#entities.Usage">Usage</a></code></h4>
+<h4><code><a title="entities.Use" href="#entities.Use">Use</a></code></h4>
 <ul class="">
-<li><code><a title="entities.Usage.duration" href="#entities.Usage.duration">duration</a></code></li>
-<li><code><a title="entities.Usage.ended_timestamp" href="#entities.Usage.ended_timestamp">ended_timestamp</a></code></li>
-<li><code><a title="entities.Usage.machine_id" href="#entities.Usage.machine_id">machine_id</a></code></li>
-<li><code><a title="entities.Usage.started_timestamp" href="#entities.Usage.started_timestamp">started_timestamp</a></code></li>
-<li><code><a title="entities.Usage.user_id" href="#entities.Usage.user_id">user_id</a></code></li>
+<li><code><a title="entities.Use.end_timestamp" href="#entities.Use.end_timestamp">end_timestamp</a></code></li>
+<li><code><a title="entities.Use.machine_id" href="#entities.Use.machine_id">machine_id</a></code></li>
+<li><code><a title="entities.Use.start_timestamp" href="#entities.Use.start_timestamp">start_timestamp</a></code></li>
+<li><code><a title="entities.Use.use_id" href="#entities.Use.use_id">use_id</a></code></li>
+<li><code><a title="entities.Use.user_id" href="#entities.Use.user_id">user_id</a></code></li>
 </ul>
 </li>
 <li>
