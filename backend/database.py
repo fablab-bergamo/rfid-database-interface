@@ -14,7 +14,7 @@ from pymongo.errors import DuplicateKeyError
 import toml
 
 
-class Database:
+class DatabaseBackend:
     """Class handling the connection from and to the database."""
 
     def __init__(self, settings_path="settings.toml") -> None:
@@ -107,6 +107,139 @@ class Database:
             )
             > 0
         )
+
+
+class DatabaseHelper(DatabaseBackend):
+    def __init__(self, settings_path="settings.toml") -> None:
+        super().__init__(settings_path)
+
+    def getUserUses(self, user_id: int = None, card_UUID: str = None) -> list[Use]:
+        """Return uses from a certain user.
+
+        Args:
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            list[Use]
+        """
+        if not user_id:
+            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User", user_id)
+
+        collection = self._db["uses"]
+        results = collection.find({"user_id": user_id}, projection={"_id": 0})
+
+        return [Use.from_dict(r) for r in results]
+
+    def isMachineCurrentlyUsed(self, machine_id: int) -> bool:
+        """Return True if the machine is currently being used, False otherwise.
+
+        Args:
+            machine_id (int): id of the Machine
+
+        Returns:
+            bool
+        """
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException("Machine", machine_id)
+
+        collection = self._db["uses"]
+        return (
+            collection.count_documents(
+                {"machine_id": machine_id, "end_timestamp": None}
+            )
+            == 1
+        )
+
+    def getCurrentlyUsedMachines(self) -> list[Machine]:
+        """Get a list of the Machine that are being used in this moment.
+
+        Returns:
+            list[Machine]
+        """
+        collection = self._db["uses"]
+        results = collection.find({"end_timestamp": None}, projection={"_id": 0})
+        return [Machine.from_dict(r["machine_id"]) for r in results]
+
+    def getUserTotalTime(self, user_id: int) -> float:
+        """Return total time the User has used the machines.
+
+        Args:
+            user_id (int): id of the User
+
+        Returns:
+            float: User time in seconds
+        """
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User", user_id)
+
+        collection = self._db["uses"]
+        uses = collection.find(
+            {"user_id": user_id, "end_timestamp": {"$exists": True, "$ne": None}}
+        )
+        total = 0
+        for u in uses:
+            total += u["end_timestamp"] - u["start_timestamp"]
+        return total
+
+    def isUserAuthroizedForMachine(
+        self, machine_id: int, user_id: int = None, card_UUID: str = None
+    ) -> bool:
+        """Return True if a User is authorized to use a Machine.
+
+        Args:
+            machine_id (int): id of the Machine
+            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
+            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
+
+        Returns:
+            bool
+        """
+        if user_id is None and card_UUID is None:
+            raise InvalidQueryException("User", "user id or card UUID")
+
+        if not self._validateMachine(machine_id=machine_id):
+            raise InvalidIdException("Machine id", machine_id)
+
+        if user_id is None:
+            user_id = self.getUserFromCardUUID(card_UUID=card_UUID).user_id
+
+        if not self._validateUser(user_id=user_id):
+            raise InvalidIdException("User id", user_id)
+
+        role = self.getUserRole(user_id)
+        if role.authorize_all:
+            return True
+
+        machine_type = self.getMachineMachineType(machine_id)
+        authorizations = self.getUserAuthorization(user_id)
+
+        return any(a.type_id == machine_type for a in authorizations)
+
+    def getUserFromCardUUID(self, card_UUID: str) -> User:
+        """Return user from the UUID of its card.
+
+        Args:
+            card_UUID (str): UUID of the card
+
+        Returns:
+            User
+        """
+        collection = self._db["users"]
+        result = collection.find_one({"card_UUID": card_UUID}, projection={"_id": 0})
+
+        if not result:
+            raise InvalidQueryException("Card UUID", card_UUID)
+
+        return User.from_dict(result)
+
+
+class Database(DatabaseHelper):
+    def __init__(self, settings_path="settings.toml") -> None:
+        super().__init__(settings_path)
 
     def dropCollections(self) -> None:
         """Drop all colletcions in database. Needless to say that this is pretty dangerous."""
@@ -1122,127 +1255,3 @@ class Database:
 
         result = collection.find_one({"end_timestamp": timestamp})
         return timestamp - result["start_timestamp"]
-
-    # helper methods
-    def getUserUses(self, user_id: int = None, card_UUID: str = None) -> list[Use]:
-        """Return uses from a certain user.
-
-        Args:
-            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
-            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
-
-        Returns:
-            list[Use]
-        """
-        if not user_id:
-            user_id = self._getUserIdFromCard(card_UUID=card_UUID)
-
-        if not self._validateUser(user_id=user_id):
-            raise InvalidIdException("User", user_id)
-
-        collection = self._db["uses"]
-        results = collection.find({"user_id": user_id}, projection={"_id": 0})
-
-        return [Use.from_dict(r) for r in results]
-
-    def isMachineCurrentlyUsed(self, machine_id: int) -> bool:
-        """Return True if the machine is currently being used, False otherwise.
-
-        Args:
-            machine_id (int): id of the Machine
-
-        Returns:
-            bool
-        """
-        if not self._validateMachine(machine_id=machine_id):
-            raise InvalidIdException("Machine", machine_id)
-
-        collection = self._db["uses"]
-        return (
-            collection.count_documents(
-                {"machine_id": machine_id, "end_timestamp": None}
-            )
-            == 1
-        )
-
-    def getCurrentlyUsedMachines(self) -> list[Machine]:
-        """Get a list of the Machine that are being used in this moment.
-
-        Returns:
-            list[Machine]
-        """
-        collection = self._db["uses"]
-        results = collection.find({"end_timestamp": None}, projection={"_id": 0})
-        return [Machine.from_dict(r["machine_id"]) for r in results]
-
-    def getUserTotalTime(self, user_id: int) -> float:
-        """Return total time the User has used the machines.
-
-        Args:
-            user_id (int): id of the User
-
-        Returns:
-            float: User time in seconds
-        """
-        if not self._validateUser(user_id=user_id):
-            raise InvalidIdException("User", user_id)
-
-        collection = self._db["uses"]
-        uses = collection.find(
-            {"user_id": user_id, "end_timestamp": {"$exists": True, "$ne": None}}
-        )
-        total = 0
-        for u in uses:
-            total += u["end_timestamp"] - u["start_timestamp"]
-        return total
-
-    def isUserAuthroizedForMachine(
-        self, machine_id: int, user_id: int = None, card_UUID: str = None
-    ) -> bool:
-        """Return True if a User is authorized to use a Machine.
-
-        Args:
-            machine_id (int): id of the Machine
-            user_id (int, optional): id of a User. Not necessary if card_UUID is passed
-            card_UUID (str, optional): card_UUID of a User. Not necessary if user_id is passed
-
-        Returns:
-            bool
-        """
-        if user_id is None and card_UUID is None:
-            raise InvalidQueryException("User", "user id or card UUID")
-
-        if not self._validateMachine(machine_id=machine_id):
-            raise InvalidIdException("Machine id", machine_id)
-
-        if user_id is None:
-            user_id = self.getUserFromCardUUID(card_UUID=card_UUID).user_id
-
-        if not self._validateUser(user_id=user_id):
-            raise InvalidIdException("User id", user_id)
-
-        role = self.getUserRole(user_id)
-        if role.authorize_all:
-            return True
-
-        machine_type = self.getMachineMachineType(machine_id)
-        authorizations = self.getUserAuthorization(user_id)
-
-        return any(a.type_id == machine_type for a in authorizations)
-
-    def getUserFromCardUUID(self, card_UUID: str) -> User:
-        """Return user from the UUID of its card.
-
-        Args:
-            card_UUID (str): UUID of the card
-
-        Returns:
-            User
-        """
-        collection = self._db["users"]
-        result = collection.find_one({"card_UUID": card_UUID}, projection={"_id": 0})
-
-        if not result:
-            raise InvalidQueryException("Card UUID", card_UUID)
-
-        return User.from_dict(result)
