@@ -23,12 +23,12 @@ def random_between(a, b):
 class TestDB(unittest.TestCase):
     def initDatabase(self):
         d = Database("test_settings.toml")
-        d.dropDatabase()
+        d.dropCollections()
         return Database("test_settings.toml")
 
     def populateSimpleDatabase(self, ids=0, timestamp=2000000000.0000):
         d = Database("test_settings.toml")
-        d.dropDatabase()
+        d.dropCollections()
         d = Database("test_settings.toml")
 
         d.addMachineType(type_id=ids, type_name="type 0")
@@ -58,7 +58,7 @@ class TestDB(unittest.TestCase):
 
     def test_drop(self):
         d = Database("test_settings.toml")
-        d.dropDatabase()
+        d.dropCollections()
         self.assertEqual(len(d.listMachines()), 0)
         self.assertEqual(len(d.listMachineTypes()), 0)
         self.assertEqual(len(d.listMaintenances()), 0)

@@ -108,8 +108,8 @@ class Database:
             > 0
         )
 
-    def dropDatabase(self) -> None:
-        """Drop all colletions in database. Needless to say that this is pretty dangerous."""
+    def dropCollections(self) -> None:
+        """Drop all colletcions in database. Needless to say that this is pretty dangerous."""
         for c in self._db.list_collection_names():
             self._db.drop_collection(c)
 
