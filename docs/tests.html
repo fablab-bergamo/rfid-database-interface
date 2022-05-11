@@ -1,0 +1,2048 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>tests API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>tests</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import unittest
+
+from time import time
+from string import ascii_uppercase
+from random import choices, randint, random
+
+from database import (
+    Database,
+    DuplicatedIdException,
+    InvalidIdException,
+    InvalidQueryException,
+)
+
+
+def random_string(k=16):
+    return &#34;&#34;.join(choices(ascii_uppercase, k=k))
+
+
+def random_between(a, b):
+    return random() * (b - a) + 1
+
+
+class TestDB(unittest.TestCase):
+    def initDatabase(self):
+        d = Database(&#34;test_settings.toml&#34;)
+        d.dropCollections()
+        return Database(&#34;test_settings.toml&#34;)
+
+    def populateSimpleDatabase(self, ids=0, timestamp=2000000000.0000):
+        d = Database(&#34;test_settings.toml&#34;)
+        d.dropCollections()
+        d = Database(&#34;test_settings.toml&#34;)
+
+        d.addMachineType(type_id=ids, type_name=&#34;type 0&#34;)
+        d.addMachineType(type_id=ids + 1, type_name=&#34;type 1&#34;)
+        d.addRole(role_id=ids, role_name=&#34;admin&#34;, authorize_all=True)
+        d.addRole(role_id=ids + 1, role_name=&#34;user&#34;)
+        d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=ids)
+        d.addUser(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;, role_id=ids + 1)
+        d.addMachine(machine_id=ids, machine_name=&#34;DRILL0&#34;, machine_type=ids)
+        d.addMachine(machine_id=ids + 1, machine_name=&#34;DRILL1&#34;, machine_type=ids + 1)
+        d.addMaintenance(
+            maintenance_id=ids, hours_between=10, description=&#34;replace engine&#34;
+        )
+        d.addMaintenance(
+            maintenance_id=ids + 1, hours_between=10, description=&#34;replace brushes&#34;
+        )
+        d.addIntervention(
+            maintenance_id=ids,
+            user_id=ids,
+            machine_id=ids,
+            timestamp=timestamp,
+        )
+        return d
+
+    def test_connection(self):
+        _ = Database(&#34;test_settings.toml&#34;)
+
+    def test_drop(self):
+        d = Database(&#34;test_settings.toml&#34;)
+        d.dropCollections()
+        self.assertEqual(len(d.listMachines()), 0)
+        self.assertEqual(len(d.listMachineTypes()), 0)
+        self.assertEqual(len(d.listMaintenances()), 0)
+        self.assertEqual(len(d.listMachines()), 0)
+        self.assertEqual(len(d.listUsers()), 0)
+
+    def test_simple_add_roles(self):
+        d = self.initDatabase()
+
+        role_names = [&#34;user&#34;, &#34;power user&#34;, &#34;moderator&#34;, &#34;crew&#34;, &#34;admin&#34;, &#34;super admin&#34;]
+
+        for i, r in enumerate(role_names):
+            d.addRole(i, r)
+
+        # check if roles were added
+        self.assertEqual(len(role_names), len(d.listRoles()))
+
+        # check if role parameters are real
+        for i, r in enumerate(d.listRoles()):
+            self.assertEqual(r.role_id, i)
+            self.assertEqual(r.role_name, role_names[i])
+
+        # edit a role name
+        new_name = &#34;TEST ROLE WOW&#34;
+        d.editRoleName(0, new_name)
+        self.assertEqual(d.getRole(0).role_name, new_name)
+        self.assertEqual(len(d.listRoles()), len(role_names))
+
+        # create a new role
+        new_role = &#34;ÜBER ADMIN&#34;
+        d.addRole(len(role_names) + 1, new_role)
+        self.assertEqual(len(d.listRoles()), len(role_names) + 1)
+        self.assertEqual(d.getRole(len(d.listRoles())).role_name, new_role)
+
+        # remove a role
+        d.removeRole(0)
+        self.assertEqual(len(d.listRoles()), len(role_names))
+        # add a new role
+        d.addRole(&#34;ÜBERÜBER ADMIN&#34;, 1000)
+        self.assertEqual(len(d.listRoles()), len(role_names) + 1)
+
+        # add a duplicate role and catch exception
+        d.addRole(&#34;0&#34;, &#34;aaa&#34;)
+        with self.assertRaises(DuplicatedIdException):
+            d.addRole(&#34;0&#34;, &#34;duplicate&#34;)
+
+    def test_types(self):
+        d = self.initDatabase()
+        type_names = [&#34;3d printer&#34;, &#34;laser cutter&#34;, &#34;vertical drill&#34;, &#34;saw&#34;]
+
+        for i, t in enumerate(type_names):
+            d.addMachineType(i, t)
+
+        # check if types were added
+        self.assertEqual(len(d.listMachineTypes()), len(type_names))
+
+        # rename a machine type
+        new_name = &#34;TEST TYPE WOW&#34;
+        d.editMachineTypeName(0, new_name)
+        self.assertEqual(d.getMachineType(0).type_name, new_name)
+
+        # add a new type
+        new_type = &#34;ÜBER TYPE&#34;
+        d.addMachineType(len(type_names) + 1, new_type)
+        self.assertEqual(len(d.listMachineTypes()), len(type_names) + 1)
+        self.assertEqual(d.getMachineType(len(type_names) + 1).type_name, new_type)
+
+        # remove a type
+        d.removeMachineType(0)
+        self.assertEqual(len(d.listMachineTypes()), len(type_names))
+        # add a new type
+        d.addMachineType(&#34;ÜBERÜBER TYPE&#34;, 1000)
+        self.assertEqual(len(d.listMachineTypes()), len(type_names) + 1)
+
+        # add a duplicated type and catch the exception
+        d.addMachineType(&#34;0&#34;, &#34;aaa&#34;)
+        with self.assertRaises(DuplicatedIdException):
+            d.addMachineType(&#34;0&#34;, &#34;duplicate&#34;)
+
+        # test get machine type
+        with self.assertRaises(InvalidIdException):
+            d.getMachineType(10)
+
+    def test_users(self):
+        d = self.initDatabase()
+        d.addRole(0, &#34;admin&#34;)
+
+        names = [&#34;Alessandro&#34;, &#34;Lorenzo&#34;, &#34;Diego&#34;, &#34;Tommaso&#34;, &#34;Riccardo&#34;]
+        surnames = [
+            &#34;Rossi&#34;,
+            &#34;Bianchi&#34;,
+            &#34;Verdi&#34;,
+            &#34;Colombo&#34;,
+            &#34;Fumagalli&#34;,
+        ]
+
+        # just to make sure
+        self.assertEqual(len(names), len(surnames))
+
+        ids = []
+        # add roles
+        for n, s in zip(names, surnames):
+            user_id = d.addUser(n, s, 0)
+            self.assertEqual(d.getUserId(n, s), user_id)
+            ids.append(user_id)
+
+        # check if roles were added
+        self.assertEqual(len(d.listUsers()), len(names))
+        # check that every role is unique
+        self.assertEqual(len(ids), len(set(ids)))
+
+        # set a new ID
+        for x in range(len(names)):
+            d.setUserId(x, 1000 + x)
+        # check that the ids are equal
+        ids = [u.user_id for u in d.listUsers()]
+        self.assertListEqual(list(x + 1000 for x in range(len(names))), ids)
+
+        # get a user from name
+        n, s = names[0], surnames[0]
+        u = d.getUser(user_name=n, user_surname=s)
+        self.assertEqual(u.name, n)
+        self.assertEqual(u.surname, s)
+
+        # get a user from id
+        p = d.getUser(u.user_id)
+        self.assertEqual(p.user_id, u.user_id)
+
+        # set a user card
+        UUID = random_string()
+        d.setUserCardUUID(u.user_id, UUID)
+        self.assertEqual(UUID, d.getUserCardUUID(u.user_id))
+
+        # add another user
+        d.addUser(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;, role_id=0, user_id=0)
+        # test get id
+        user_id = d.getUserId(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;)
+        self.assertEqual(user_id, 0)
+
+        # test  invalid name
+        with self.assertRaises(InvalidQueryException):
+            d.getUserId(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;)
+
+        # test invalid role
+        with self.assertRaises(InvalidIdException):
+            d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=10)
+
+        # test invalid id
+        with self.assertRaises(DuplicatedIdException):
+            d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.getUser(10)
+        with self.assertRaises(InvalidIdException):
+            d.getUserCardUUID(10)
+
+    def test_roles(self):
+        d = self.initDatabase()
+        d.addRole(0, &#34;admin&#34;)
+        d.addRole(1, &#34;user&#34;)
+
+        user_id = d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=0)
+        d.setUserRole(user_id=user_id, role_id=1)
+        self.assertEqual(d.getUserRole(user_id=user_id).role_id, 1)
+
+        with self.assertRaises(InvalidIdException):
+            d.setUserRole(user_id=user_id, role_id=4)
+
+        with self.assertRaises(InvalidIdException):
+            d.getUserRole(user_id=10)
+
+        with self.assertRaises(InvalidIdException):
+            d.getRole(10)
+
+    def test_get_user_authorizations(self):
+        d = self.populateSimpleDatabase()
+
+        # check the authorization
+        d.setUserAuthorization(0, [0])
+        auth = d.isUserAuthroizedForMachine(machine_id=0, user_id=0)
+        self.assertTrue(auth)
+
+        # add user with UUID
+        card_UUID = &#34;1234567890&#34;
+        d.setUserCardUUID(user_id=1, card_UUID=card_UUID)
+        # test its authorizations
+        d.setUserAuthorization(1, [0])
+        auth = d.isUserAuthroizedForMachine(machine_id=0, card_UUID=card_UUID)
+        self.assertTrue(auth)
+        d.setUserAuthorization(1, [0, 1])
+        auth = d.isUserAuthroizedForMachine(machine_id=1, card_UUID=card_UUID)
+        self.assertTrue(auth)
+        d.setUserAuthorization(1, [])
+        for x in range(2):
+            auth = d.isUserAuthroizedForMachine(machine_id=x, card_UUID=card_UUID)
+            self.assertFalse(auth)
+
+        # test invalid query
+        with self.assertRaises(InvalidQueryException):
+            d.isUserAuthroizedForMachine(machine_id=0)
+        with self.assertRaises(InvalidQueryException):
+            d.isUserAuthroizedForMachine(machine_id=0, card_UUID=&#34;LMAO&#34;)
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.isUserAuthroizedForMachine(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.isUserAuthroizedForMachine(machine_id=10, user_id=0)
+
+    def test_set_authorizations(self):
+        d = self.populateSimpleDatabase()
+        # test user auth
+        d.setUserAuthorization(1, [0])
+        authorization_ids = [t.type_id for t in d.getUserAuthorization(1)]
+        self.assertListEqual(authorization_ids, [0])
+        # test admin auth
+        d.setUserAuthorization(0, [])
+        self.assertTrue(d.isUserAuthroizedForMachine(machine_id=0, user_id=0))
+
+        # test invalid authorization
+        with self.assertRaises(InvalidQueryException):
+            d.setUserAuthorization(0, 0)
+        with self.assertRaises(InvalidIdException):
+            d.setUserAuthorization(0, [10, 20])
+        # test invalid user id
+        with self.assertRaises(InvalidIdException):
+            d.getUserAuthorization(10)
+
+    def test_long_add_users(self):
+        d = self.initDatabase()
+
+        USERS = 100
+        name = &#34;Mario&#34;
+        surname = &#34;Rossi&#34;
+
+        d.addRole(0, &#34;admin&#34;)
+
+        for _ in range(USERS):
+            d.addUser(name, surname, 0)
+        self.assertEqual(len(d.listUsers()), USERS)
+
+    def test_machines(self):
+        d = self.initDatabase()
+
+        TYPES = 10
+        MACHINES = 10
+        current_id = 0
+
+        # create machines for each type
+        for i in range(TYPES):
+            NAME = random_string(10)
+            d.addMachineType(type_id=i, type_name=NAME)
+            self.assertEqual(len(d.listMachineTypes()), i + 1)
+            for _ in range(MACHINES):
+                name = random_string(6)
+                d.addMachine(
+                    machine_id=current_id,
+                    machine_name=name,
+                    machine_type=i,
+                )
+                current_id += 1
+
+        # test that they have been added
+        self.assertEqual(MACHINES * TYPES, len(d.listMachines()))
+
+        for current_id in range(MACHINES * TYPES):
+            self.assertEqual(d.getMachine(current_id).machine_id, current_id)
+            hours = random_between(10, 1000)
+            d.setMachinesHours(current_id, hours)
+            self.assertEqual(d.getMachineHours(current_id), hours)
+
+        for current_id in range(MACHINES * TYPES):
+            # test rename
+            NAME = random_string(10)
+            d.setMachineName(current_id, NAME)
+            self.assertEqual(d.getMachineName(current_id), NAME)
+            # test new type
+            NEW_TYPE = randint(0, TYPES - 1)
+            d.setMachineMachineType(current_id, NEW_TYPE)
+            self.assertEqual(NEW_TYPE, d.getMachineMachineType(current_id))
+
+            d.removeMachine(current_id)
+            # test delete
+            self.assertEqual(MACHINES * TYPES - current_id - 1, len(d.listMachines()))
+
+        # test delete
+        self.assertEqual(0, len(d.listMachines()))
+
+        # test invalid machine types
+        with self.assertRaises(InvalidQueryException):
+            d.addMachine(0, &#34;&#34;, 10)
+
+        d.addMachine(machine_id=0, machine_name=&#34;drill&#34;, machine_type=0)
+        # test invalid machine id
+        with self.assertRaises(DuplicatedIdException):
+            d.addMachine(machine_id=0, machine_name=&#34;drill&#34;, machine_type=0)
+        with self.assertRaises(InvalidIdException):
+            d.getMachine(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineHours(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineMachineType(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.setMachineMachineType(machine_id=10, machine_type=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineName(machine_id=10)
+
+    def test_maintenances(self):
+        d = self.initDatabase()
+
+        MAINTENANCES = 100
+
+        for x in range(MAINTENANCES):
+            hours_between = random_between(5, 10)
+            description = random_string(50)
+            new_id = d.addMaintenance(hours_between, description)
+            # check if the new id is the same as the index
+            self.assertEqual(x, new_id)
+            # check getters and setters
+            self.assertEqual(d.getMaintenanceHoursBetween(new_id), hours_between)
+            self.assertEqual(d.getMaintenanceDescription(new_id), description)
+
+            hours_between = random_between(5, 10)
+            description = random_string(50)
+            d.setMaintenanceHoursBetween(x, hours_between)
+            d.setMaintenanceDescription(x, description)
+            self.assertEqual(d.getMaintenanceHoursBetween(new_id), hours_between)
+            self.assertEqual(d.getMaintenanceDescription(new_id), description)
+
+        # check get
+        self.assertEqual(d.getMaintenance(maintenance_id=0).maintenance_id, 0)
+
+        # check removal
+        for x in range(MAINTENANCES):
+            d.removeMaintenance(x)
+            self.assertEqual(MAINTENANCES - x - 1, len(d.listMaintenances()))
+            d.removeMaintenance(x)
+            self.assertEqual(MAINTENANCES - x - 1, len(d.listMaintenances()))
+
+        self.assertEqual(len(d.listMaintenances()), 0)
+
+        # check invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.getMaintenance(maintenance_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMaintenanceDescription(maintenance_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMaintenanceHoursBetween(maintenance_id=10)
+
+        # check double add
+        d.addMaintenance(maintenance_id=0, description=&#34;WHAT&#34;, hours_between=10)
+        with self.assertRaises(DuplicatedIdException):
+            d.addMaintenance(
+                maintenance_id=0, description=&#34;YOU AGAIN&#34;, hours_between=10
+            )
+
+    def test_machine_maintenance_interaction(self):
+        d = self.initDatabase()
+
+        MACHINE_TYPE = &#34;drill&#34;
+        MACHINES = 3
+        # create simple machine types
+        d.addMachineType(type_id=0, type_name=MACHINE_TYPE)
+
+        # create simple machine
+        for x in range(MACHINES):
+            d.addMachine(x, f&#34;TEST{x}&#34;, 0, 0)
+
+        # create simple maintenances
+        MAINTENANCES_DESC = [&#34;change oil&#34;, &#34;clean mirror&#34;, &#34;empty bin&#34;]
+        for i, m in enumerate(MAINTENANCES_DESC):
+            d.addMaintenance(maintenance_id=i, description=m, hours_between=10)
+            d.addMachineMaintenance(i, i)
+            self.assertEqual(len(d.getMachineMaintenances(i)), 1)
+            self.assertEqual(d.getMachineMaintenances(i)[0].maintenance_id, i)
+            self.assertEqual(
+                d.getMachineMaintenances(i)[0].description, MAINTENANCES_DESC[i]
+            )
+
+        # remove maintenances from machines
+        for x in range(MACHINES):
+            d.removeMachineMaintenance(x, x)
+            self.assertEqual(len(d.getMachineMaintenances(x)), 0)
+
+        # remove maintenances
+        for i in range(len(MAINTENANCES_DESC)):
+            d.removeMaintenance(i)
+            self.assertEqual(len(d.listMaintenances()), len(MAINTENANCES_DESC) - i - 1)
+        # check that everything was removed
+        self.assertEqual(len(d.listMaintenances()), 0)
+
+        d.addMaintenance(hours_between=10, description=&#34;test&#34;, maintenance_id=0)
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.addMachineMaintenance(machine_id=0, maintenance_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.addMachineMaintenance(machine_id=10, maintenance_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineMaintenances(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.removeMachineMaintenance(machine_id=10, maintenance_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.removeMachineMaintenance(machine_id=0, maintenance_id=10)
+
+        # test remove maintenance that&#39;s nto present
+        with self.assertRaises(InvalidIdException):
+            d.removeMachineMaintenance(machine_id=0, maintenance_id=0)
+
+    def test_machine_multiple_maintenances(self):
+        # test multiple maintenances in machine
+        d = self.populateSimpleDatabase()
+        d.addMachineMaintenance(0, 0)
+        self.assertEqual(len(d.getMachineMaintenances(0)), 1)
+        d.addMachineMaintenance(0, 1)
+        self.assertEqual(len(d.getMachineMaintenances(0)), 2)
+        maintenance_ids = [m.maintenance_id for m in d.getMachineMaintenances(0)]
+        self.assertListEqual(maintenance_ids, [0, 1])
+        d.removeMachineMaintenance(0, 0)
+        self.assertEqual(len(d.getMachineMaintenances(0)), 1)
+
+    def test_interventions(self):
+        d = self.populateSimpleDatabase(ids=0, timestamp=time())
+
+        intervention_id = d.addIntervention(maintenance_id=0, user_id=0, machine_id=0)
+
+        # test get set
+        self.assertEqual(intervention_id, len(d.listInterventions()) - 1)
+        self.assertEqual(d.getInterventionUser(0).user_id, 0)
+        self.assertEqual(d.getInterventionMachine(0).machine_id, 0)
+        self.assertAlmostEqual(d.getInterventionTimestamp(0), time(), delta=1000)
+        self.assertEqual(
+            d.getIntervention(intervention_id=intervention_id).intervention_id,
+            intervention_id,
+        )
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.addIntervention(maintenance_id=10, machine_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.addIntervention(maintenance_id=0, machine_id=10, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.addIntervention(maintenance_id=0, machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getIntervention(intervention_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getInterventionUser(intervention_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getInterventionMachine(intervention_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getInterventionTimestamp(intervention_id=10)
+
+    def test_user_use_interaction(self):
+        d = self.populateSimpleDatabase()
+        d.startUse(machine_id=0, user_id=0, timestamp=time())
+        duration = d.endUse(machine_id=0, user_id=0, timestamp=time() + 1000)
+        self.assertAlmostEqual(duration, 1000, places=2)
+        d.startUse(machine_id=1, user_id=1)
+        duration = d.endUse(machine_id=1, user_id=1)
+        self.assertAlmostEqual(duration, 0, places=2)
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=10, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.endUse(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.endUse(machine_id=10, user_id=0)
+
+        # test end before start
+        with self.assertRaises(InvalidQueryException):
+            d.endUse(machine_id=0, user_id=0)
+
+    def test_use_helpers(self):
+        d = self.populateSimpleDatabase()
+        DURATION = 2 * 3600
+        CARD_UUID = &#34;ABCD1234&#34;
+
+        # test simple use
+        d.startUse(machine_id=0, user_id=0)
+        elapsed = d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+        uses = d.getUserUses(user_id=0)
+        in_use = d.getCurrentlyUsedMachines()
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(len(in_use), 0)
+        self.assertAlmostEqual(elapsed, DURATION, places=2)
+
+        # test total time
+        d.setUserCardUUID(user_id=1, card_UUID=CARD_UUID)
+        d.startUse(machine_id=1, user_id=1)
+        elapsed = d.endUse(machine_id=1, user_id=1, timestamp=time() + DURATION)
+        uses = d.getUserUses(user_id=1)
+        in_use = d.getCurrentlyUsedMachines()
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(len(in_use), 0)
+        self.assertEqual(d.getUserTotalTime(user_id=1), elapsed)
+
+        # test in use
+        d.startUse(machine_id=0, user_id=0)
+        in_use = d.isMachineCurrentlyUsed(machine_id=0)
+        self.assertTrue(in_use)
+        d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+        in_use = d.isMachineCurrentlyUsed(machine_id=0)
+        self.assertFalse(in_use)
+        in_use = d.isMachineCurrentlyUsed(machine_id=1)
+        self.assertFalse(in_use)
+
+        # test start machine that&#39;s being used
+        d.startUse(machine_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=0, user_id=1)
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.getUserUses(user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.isMachineCurrentlyUsed(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getUserTotalTime(user_id=10)
+
+
+if __name__ == &#34;__main__&#34;:
+    unittest.main()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="tests.random"><code class="name flex">
+<span>def <span class="ident">random</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>random() -&gt; x in the interval [0, 1).</p></div>
+</dd>
+<dt id="tests.random_between"><code class="name flex">
+<span>def <span class="ident">random_between</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def random_between(a, b):
+    return random() * (b - a) + 1</code></pre>
+</details>
+</dd>
+<dt id="tests.random_string"><code class="name flex">
+<span>def <span class="ident">random_string</span></span>(<span>k=16)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def random_string(k=16):
+    return &#34;&#34;.join(choices(ascii_uppercase, k=k))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="tests.TestDB"><code class="flex name class">
+<span>class <span class="ident">TestDB</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class whose instances are single test cases.</p>
+<p>By default, the test code itself should be placed in a method named
+'runTest'.</p>
+<p>If the fixture may be used for many test cases, create as
+many test methods as are needed. When instantiating such a TestCase
+subclass, specify in the constructor arguments the name of the test method
+that the instance is to execute.</p>
+<p>Test authors should subclass TestCase for their own tests. Construction
+and deconstruction of the test's environment ('fixture') can be
+implemented by overriding the 'setUp' and 'tearDown' methods respectively.</p>
+<p>If it is necessary to override the <strong>init</strong> method, the base class
+<strong>init</strong> method must always be called. It is important that subclasses
+should not change the signature of their <strong>init</strong> method, since instances
+of the classes are instantiated automatically by parts of the framework
+in order to be run.</p>
+<p>When subclassing TestCase, you can set these attributes:
+* failureException: determines which exception will be raised when
+the instance's assertion methods fail; test methods raising this
+exception will be deemed to have 'failed' rather than 'errored'.
+* longMessage: determines whether long messages (including repr of
+objects used in assert methods) will be printed on failure in <em>addition</em>
+to any explicit message passed.
+* maxDiff: sets the maximum length of a diff in failure messages
+by assert methods using difflib. It is looked up as an instance
+attribute so can be configured by individual tests if required.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestDB(unittest.TestCase):
+    def initDatabase(self):
+        d = Database(&#34;test_settings.toml&#34;)
+        d.dropCollections()
+        return Database(&#34;test_settings.toml&#34;)
+
+    def populateSimpleDatabase(self, ids=0, timestamp=2000000000.0000):
+        d = Database(&#34;test_settings.toml&#34;)
+        d.dropCollections()
+        d = Database(&#34;test_settings.toml&#34;)
+
+        d.addMachineType(type_id=ids, type_name=&#34;type 0&#34;)
+        d.addMachineType(type_id=ids + 1, type_name=&#34;type 1&#34;)
+        d.addRole(role_id=ids, role_name=&#34;admin&#34;, authorize_all=True)
+        d.addRole(role_id=ids + 1, role_name=&#34;user&#34;)
+        d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=ids)
+        d.addUser(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;, role_id=ids + 1)
+        d.addMachine(machine_id=ids, machine_name=&#34;DRILL0&#34;, machine_type=ids)
+        d.addMachine(machine_id=ids + 1, machine_name=&#34;DRILL1&#34;, machine_type=ids + 1)
+        d.addMaintenance(
+            maintenance_id=ids, hours_between=10, description=&#34;replace engine&#34;
+        )
+        d.addMaintenance(
+            maintenance_id=ids + 1, hours_between=10, description=&#34;replace brushes&#34;
+        )
+        d.addIntervention(
+            maintenance_id=ids,
+            user_id=ids,
+            machine_id=ids,
+            timestamp=timestamp,
+        )
+        return d
+
+    def test_connection(self):
+        _ = Database(&#34;test_settings.toml&#34;)
+
+    def test_drop(self):
+        d = Database(&#34;test_settings.toml&#34;)
+        d.dropCollections()
+        self.assertEqual(len(d.listMachines()), 0)
+        self.assertEqual(len(d.listMachineTypes()), 0)
+        self.assertEqual(len(d.listMaintenances()), 0)
+        self.assertEqual(len(d.listMachines()), 0)
+        self.assertEqual(len(d.listUsers()), 0)
+
+    def test_simple_add_roles(self):
+        d = self.initDatabase()
+
+        role_names = [&#34;user&#34;, &#34;power user&#34;, &#34;moderator&#34;, &#34;crew&#34;, &#34;admin&#34;, &#34;super admin&#34;]
+
+        for i, r in enumerate(role_names):
+            d.addRole(i, r)
+
+        # check if roles were added
+        self.assertEqual(len(role_names), len(d.listRoles()))
+
+        # check if role parameters are real
+        for i, r in enumerate(d.listRoles()):
+            self.assertEqual(r.role_id, i)
+            self.assertEqual(r.role_name, role_names[i])
+
+        # edit a role name
+        new_name = &#34;TEST ROLE WOW&#34;
+        d.editRoleName(0, new_name)
+        self.assertEqual(d.getRole(0).role_name, new_name)
+        self.assertEqual(len(d.listRoles()), len(role_names))
+
+        # create a new role
+        new_role = &#34;ÜBER ADMIN&#34;
+        d.addRole(len(role_names) + 1, new_role)
+        self.assertEqual(len(d.listRoles()), len(role_names) + 1)
+        self.assertEqual(d.getRole(len(d.listRoles())).role_name, new_role)
+
+        # remove a role
+        d.removeRole(0)
+        self.assertEqual(len(d.listRoles()), len(role_names))
+        # add a new role
+        d.addRole(&#34;ÜBERÜBER ADMIN&#34;, 1000)
+        self.assertEqual(len(d.listRoles()), len(role_names) + 1)
+
+        # add a duplicate role and catch exception
+        d.addRole(&#34;0&#34;, &#34;aaa&#34;)
+        with self.assertRaises(DuplicatedIdException):
+            d.addRole(&#34;0&#34;, &#34;duplicate&#34;)
+
+    def test_types(self):
+        d = self.initDatabase()
+        type_names = [&#34;3d printer&#34;, &#34;laser cutter&#34;, &#34;vertical drill&#34;, &#34;saw&#34;]
+
+        for i, t in enumerate(type_names):
+            d.addMachineType(i, t)
+
+        # check if types were added
+        self.assertEqual(len(d.listMachineTypes()), len(type_names))
+
+        # rename a machine type
+        new_name = &#34;TEST TYPE WOW&#34;
+        d.editMachineTypeName(0, new_name)
+        self.assertEqual(d.getMachineType(0).type_name, new_name)
+
+        # add a new type
+        new_type = &#34;ÜBER TYPE&#34;
+        d.addMachineType(len(type_names) + 1, new_type)
+        self.assertEqual(len(d.listMachineTypes()), len(type_names) + 1)
+        self.assertEqual(d.getMachineType(len(type_names) + 1).type_name, new_type)
+
+        # remove a type
+        d.removeMachineType(0)
+        self.assertEqual(len(d.listMachineTypes()), len(type_names))
+        # add a new type
+        d.addMachineType(&#34;ÜBERÜBER TYPE&#34;, 1000)
+        self.assertEqual(len(d.listMachineTypes()), len(type_names) + 1)
+
+        # add a duplicated type and catch the exception
+        d.addMachineType(&#34;0&#34;, &#34;aaa&#34;)
+        with self.assertRaises(DuplicatedIdException):
+            d.addMachineType(&#34;0&#34;, &#34;duplicate&#34;)
+
+        # test get machine type
+        with self.assertRaises(InvalidIdException):
+            d.getMachineType(10)
+
+    def test_users(self):
+        d = self.initDatabase()
+        d.addRole(0, &#34;admin&#34;)
+
+        names = [&#34;Alessandro&#34;, &#34;Lorenzo&#34;, &#34;Diego&#34;, &#34;Tommaso&#34;, &#34;Riccardo&#34;]
+        surnames = [
+            &#34;Rossi&#34;,
+            &#34;Bianchi&#34;,
+            &#34;Verdi&#34;,
+            &#34;Colombo&#34;,
+            &#34;Fumagalli&#34;,
+        ]
+
+        # just to make sure
+        self.assertEqual(len(names), len(surnames))
+
+        ids = []
+        # add roles
+        for n, s in zip(names, surnames):
+            user_id = d.addUser(n, s, 0)
+            self.assertEqual(d.getUserId(n, s), user_id)
+            ids.append(user_id)
+
+        # check if roles were added
+        self.assertEqual(len(d.listUsers()), len(names))
+        # check that every role is unique
+        self.assertEqual(len(ids), len(set(ids)))
+
+        # set a new ID
+        for x in range(len(names)):
+            d.setUserId(x, 1000 + x)
+        # check that the ids are equal
+        ids = [u.user_id for u in d.listUsers()]
+        self.assertListEqual(list(x + 1000 for x in range(len(names))), ids)
+
+        # get a user from name
+        n, s = names[0], surnames[0]
+        u = d.getUser(user_name=n, user_surname=s)
+        self.assertEqual(u.name, n)
+        self.assertEqual(u.surname, s)
+
+        # get a user from id
+        p = d.getUser(u.user_id)
+        self.assertEqual(p.user_id, u.user_id)
+
+        # set a user card
+        UUID = random_string()
+        d.setUserCardUUID(u.user_id, UUID)
+        self.assertEqual(UUID, d.getUserCardUUID(u.user_id))
+
+        # add another user
+        d.addUser(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;, role_id=0, user_id=0)
+        # test get id
+        user_id = d.getUserId(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;)
+        self.assertEqual(user_id, 0)
+
+        # test  invalid name
+        with self.assertRaises(InvalidQueryException):
+            d.getUserId(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;)
+
+        # test invalid role
+        with self.assertRaises(InvalidIdException):
+            d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=10)
+
+        # test invalid id
+        with self.assertRaises(DuplicatedIdException):
+            d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.getUser(10)
+        with self.assertRaises(InvalidIdException):
+            d.getUserCardUUID(10)
+
+    def test_roles(self):
+        d = self.initDatabase()
+        d.addRole(0, &#34;admin&#34;)
+        d.addRole(1, &#34;user&#34;)
+
+        user_id = d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=0)
+        d.setUserRole(user_id=user_id, role_id=1)
+        self.assertEqual(d.getUserRole(user_id=user_id).role_id, 1)
+
+        with self.assertRaises(InvalidIdException):
+            d.setUserRole(user_id=user_id, role_id=4)
+
+        with self.assertRaises(InvalidIdException):
+            d.getUserRole(user_id=10)
+
+        with self.assertRaises(InvalidIdException):
+            d.getRole(10)
+
+    def test_get_user_authorizations(self):
+        d = self.populateSimpleDatabase()
+
+        # check the authorization
+        d.setUserAuthorization(0, [0])
+        auth = d.isUserAuthroizedForMachine(machine_id=0, user_id=0)
+        self.assertTrue(auth)
+
+        # add user with UUID
+        card_UUID = &#34;1234567890&#34;
+        d.setUserCardUUID(user_id=1, card_UUID=card_UUID)
+        # test its authorizations
+        d.setUserAuthorization(1, [0])
+        auth = d.isUserAuthroizedForMachine(machine_id=0, card_UUID=card_UUID)
+        self.assertTrue(auth)
+        d.setUserAuthorization(1, [0, 1])
+        auth = d.isUserAuthroizedForMachine(machine_id=1, card_UUID=card_UUID)
+        self.assertTrue(auth)
+        d.setUserAuthorization(1, [])
+        for x in range(2):
+            auth = d.isUserAuthroizedForMachine(machine_id=x, card_UUID=card_UUID)
+            self.assertFalse(auth)
+
+        # test invalid query
+        with self.assertRaises(InvalidQueryException):
+            d.isUserAuthroizedForMachine(machine_id=0)
+        with self.assertRaises(InvalidQueryException):
+            d.isUserAuthroizedForMachine(machine_id=0, card_UUID=&#34;LMAO&#34;)
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.isUserAuthroizedForMachine(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.isUserAuthroizedForMachine(machine_id=10, user_id=0)
+
+    def test_set_authorizations(self):
+        d = self.populateSimpleDatabase()
+        # test user auth
+        d.setUserAuthorization(1, [0])
+        authorization_ids = [t.type_id for t in d.getUserAuthorization(1)]
+        self.assertListEqual(authorization_ids, [0])
+        # test admin auth
+        d.setUserAuthorization(0, [])
+        self.assertTrue(d.isUserAuthroizedForMachine(machine_id=0, user_id=0))
+
+        # test invalid authorization
+        with self.assertRaises(InvalidQueryException):
+            d.setUserAuthorization(0, 0)
+        with self.assertRaises(InvalidIdException):
+            d.setUserAuthorization(0, [10, 20])
+        # test invalid user id
+        with self.assertRaises(InvalidIdException):
+            d.getUserAuthorization(10)
+
+    def test_long_add_users(self):
+        d = self.initDatabase()
+
+        USERS = 100
+        name = &#34;Mario&#34;
+        surname = &#34;Rossi&#34;
+
+        d.addRole(0, &#34;admin&#34;)
+
+        for _ in range(USERS):
+            d.addUser(name, surname, 0)
+        self.assertEqual(len(d.listUsers()), USERS)
+
+    def test_machines(self):
+        d = self.initDatabase()
+
+        TYPES = 10
+        MACHINES = 10
+        current_id = 0
+
+        # create machines for each type
+        for i in range(TYPES):
+            NAME = random_string(10)
+            d.addMachineType(type_id=i, type_name=NAME)
+            self.assertEqual(len(d.listMachineTypes()), i + 1)
+            for _ in range(MACHINES):
+                name = random_string(6)
+                d.addMachine(
+                    machine_id=current_id,
+                    machine_name=name,
+                    machine_type=i,
+                )
+                current_id += 1
+
+        # test that they have been added
+        self.assertEqual(MACHINES * TYPES, len(d.listMachines()))
+
+        for current_id in range(MACHINES * TYPES):
+            self.assertEqual(d.getMachine(current_id).machine_id, current_id)
+            hours = random_between(10, 1000)
+            d.setMachinesHours(current_id, hours)
+            self.assertEqual(d.getMachineHours(current_id), hours)
+
+        for current_id in range(MACHINES * TYPES):
+            # test rename
+            NAME = random_string(10)
+            d.setMachineName(current_id, NAME)
+            self.assertEqual(d.getMachineName(current_id), NAME)
+            # test new type
+            NEW_TYPE = randint(0, TYPES - 1)
+            d.setMachineMachineType(current_id, NEW_TYPE)
+            self.assertEqual(NEW_TYPE, d.getMachineMachineType(current_id))
+
+            d.removeMachine(current_id)
+            # test delete
+            self.assertEqual(MACHINES * TYPES - current_id - 1, len(d.listMachines()))
+
+        # test delete
+        self.assertEqual(0, len(d.listMachines()))
+
+        # test invalid machine types
+        with self.assertRaises(InvalidQueryException):
+            d.addMachine(0, &#34;&#34;, 10)
+
+        d.addMachine(machine_id=0, machine_name=&#34;drill&#34;, machine_type=0)
+        # test invalid machine id
+        with self.assertRaises(DuplicatedIdException):
+            d.addMachine(machine_id=0, machine_name=&#34;drill&#34;, machine_type=0)
+        with self.assertRaises(InvalidIdException):
+            d.getMachine(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineHours(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineMachineType(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.setMachineMachineType(machine_id=10, machine_type=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineName(machine_id=10)
+
+    def test_maintenances(self):
+        d = self.initDatabase()
+
+        MAINTENANCES = 100
+
+        for x in range(MAINTENANCES):
+            hours_between = random_between(5, 10)
+            description = random_string(50)
+            new_id = d.addMaintenance(hours_between, description)
+            # check if the new id is the same as the index
+            self.assertEqual(x, new_id)
+            # check getters and setters
+            self.assertEqual(d.getMaintenanceHoursBetween(new_id), hours_between)
+            self.assertEqual(d.getMaintenanceDescription(new_id), description)
+
+            hours_between = random_between(5, 10)
+            description = random_string(50)
+            d.setMaintenanceHoursBetween(x, hours_between)
+            d.setMaintenanceDescription(x, description)
+            self.assertEqual(d.getMaintenanceHoursBetween(new_id), hours_between)
+            self.assertEqual(d.getMaintenanceDescription(new_id), description)
+
+        # check get
+        self.assertEqual(d.getMaintenance(maintenance_id=0).maintenance_id, 0)
+
+        # check removal
+        for x in range(MAINTENANCES):
+            d.removeMaintenance(x)
+            self.assertEqual(MAINTENANCES - x - 1, len(d.listMaintenances()))
+            d.removeMaintenance(x)
+            self.assertEqual(MAINTENANCES - x - 1, len(d.listMaintenances()))
+
+        self.assertEqual(len(d.listMaintenances()), 0)
+
+        # check invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.getMaintenance(maintenance_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMaintenanceDescription(maintenance_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getMaintenanceHoursBetween(maintenance_id=10)
+
+        # check double add
+        d.addMaintenance(maintenance_id=0, description=&#34;WHAT&#34;, hours_between=10)
+        with self.assertRaises(DuplicatedIdException):
+            d.addMaintenance(
+                maintenance_id=0, description=&#34;YOU AGAIN&#34;, hours_between=10
+            )
+
+    def test_machine_maintenance_interaction(self):
+        d = self.initDatabase()
+
+        MACHINE_TYPE = &#34;drill&#34;
+        MACHINES = 3
+        # create simple machine types
+        d.addMachineType(type_id=0, type_name=MACHINE_TYPE)
+
+        # create simple machine
+        for x in range(MACHINES):
+            d.addMachine(x, f&#34;TEST{x}&#34;, 0, 0)
+
+        # create simple maintenances
+        MAINTENANCES_DESC = [&#34;change oil&#34;, &#34;clean mirror&#34;, &#34;empty bin&#34;]
+        for i, m in enumerate(MAINTENANCES_DESC):
+            d.addMaintenance(maintenance_id=i, description=m, hours_between=10)
+            d.addMachineMaintenance(i, i)
+            self.assertEqual(len(d.getMachineMaintenances(i)), 1)
+            self.assertEqual(d.getMachineMaintenances(i)[0].maintenance_id, i)
+            self.assertEqual(
+                d.getMachineMaintenances(i)[0].description, MAINTENANCES_DESC[i]
+            )
+
+        # remove maintenances from machines
+        for x in range(MACHINES):
+            d.removeMachineMaintenance(x, x)
+            self.assertEqual(len(d.getMachineMaintenances(x)), 0)
+
+        # remove maintenances
+        for i in range(len(MAINTENANCES_DESC)):
+            d.removeMaintenance(i)
+            self.assertEqual(len(d.listMaintenances()), len(MAINTENANCES_DESC) - i - 1)
+        # check that everything was removed
+        self.assertEqual(len(d.listMaintenances()), 0)
+
+        d.addMaintenance(hours_between=10, description=&#34;test&#34;, maintenance_id=0)
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.addMachineMaintenance(machine_id=0, maintenance_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.addMachineMaintenance(machine_id=10, maintenance_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.getMachineMaintenances(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.removeMachineMaintenance(machine_id=10, maintenance_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.removeMachineMaintenance(machine_id=0, maintenance_id=10)
+
+        # test remove maintenance that&#39;s nto present
+        with self.assertRaises(InvalidIdException):
+            d.removeMachineMaintenance(machine_id=0, maintenance_id=0)
+
+    def test_machine_multiple_maintenances(self):
+        # test multiple maintenances in machine
+        d = self.populateSimpleDatabase()
+        d.addMachineMaintenance(0, 0)
+        self.assertEqual(len(d.getMachineMaintenances(0)), 1)
+        d.addMachineMaintenance(0, 1)
+        self.assertEqual(len(d.getMachineMaintenances(0)), 2)
+        maintenance_ids = [m.maintenance_id for m in d.getMachineMaintenances(0)]
+        self.assertListEqual(maintenance_ids, [0, 1])
+        d.removeMachineMaintenance(0, 0)
+        self.assertEqual(len(d.getMachineMaintenances(0)), 1)
+
+    def test_interventions(self):
+        d = self.populateSimpleDatabase(ids=0, timestamp=time())
+
+        intervention_id = d.addIntervention(maintenance_id=0, user_id=0, machine_id=0)
+
+        # test get set
+        self.assertEqual(intervention_id, len(d.listInterventions()) - 1)
+        self.assertEqual(d.getInterventionUser(0).user_id, 0)
+        self.assertEqual(d.getInterventionMachine(0).machine_id, 0)
+        self.assertAlmostEqual(d.getInterventionTimestamp(0), time(), delta=1000)
+        self.assertEqual(
+            d.getIntervention(intervention_id=intervention_id).intervention_id,
+            intervention_id,
+        )
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.addIntervention(maintenance_id=10, machine_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.addIntervention(maintenance_id=0, machine_id=10, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.addIntervention(maintenance_id=0, machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getIntervention(intervention_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getInterventionUser(intervention_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getInterventionMachine(intervention_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getInterventionTimestamp(intervention_id=10)
+
+    def test_user_use_interaction(self):
+        d = self.populateSimpleDatabase()
+        d.startUse(machine_id=0, user_id=0, timestamp=time())
+        duration = d.endUse(machine_id=0, user_id=0, timestamp=time() + 1000)
+        self.assertAlmostEqual(duration, 1000, places=2)
+        d.startUse(machine_id=1, user_id=1)
+        duration = d.endUse(machine_id=1, user_id=1)
+        self.assertAlmostEqual(duration, 0, places=2)
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=10, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.endUse(machine_id=0, user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.endUse(machine_id=10, user_id=0)
+
+        # test end before start
+        with self.assertRaises(InvalidQueryException):
+            d.endUse(machine_id=0, user_id=0)
+
+    def test_use_helpers(self):
+        d = self.populateSimpleDatabase()
+        DURATION = 2 * 3600
+        CARD_UUID = &#34;ABCD1234&#34;
+
+        # test simple use
+        d.startUse(machine_id=0, user_id=0)
+        elapsed = d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+        uses = d.getUserUses(user_id=0)
+        in_use = d.getCurrentlyUsedMachines()
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(len(in_use), 0)
+        self.assertAlmostEqual(elapsed, DURATION, places=2)
+
+        # test total time
+        d.setUserCardUUID(user_id=1, card_UUID=CARD_UUID)
+        d.startUse(machine_id=1, user_id=1)
+        elapsed = d.endUse(machine_id=1, user_id=1, timestamp=time() + DURATION)
+        uses = d.getUserUses(user_id=1)
+        in_use = d.getCurrentlyUsedMachines()
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(len(in_use), 0)
+        self.assertEqual(d.getUserTotalTime(user_id=1), elapsed)
+
+        # test in use
+        d.startUse(machine_id=0, user_id=0)
+        in_use = d.isMachineCurrentlyUsed(machine_id=0)
+        self.assertTrue(in_use)
+        d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+        in_use = d.isMachineCurrentlyUsed(machine_id=0)
+        self.assertFalse(in_use)
+        in_use = d.isMachineCurrentlyUsed(machine_id=1)
+        self.assertFalse(in_use)
+
+        # test start machine that&#39;s being used
+        d.startUse(machine_id=0, user_id=0)
+        with self.assertRaises(InvalidIdException):
+            d.startUse(machine_id=0, user_id=1)
+
+        # test invalid ids
+        with self.assertRaises(InvalidIdException):
+            d.getUserUses(user_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.isMachineCurrentlyUsed(machine_id=10)
+        with self.assertRaises(InvalidIdException):
+            d.getUserTotalTime(user_id=10)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="tests.TestDB.initDatabase"><code class="name flex">
+<span>def <span class="ident">initDatabase</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def initDatabase(self):
+    d = Database(&#34;test_settings.toml&#34;)
+    d.dropCollections()
+    return Database(&#34;test_settings.toml&#34;)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.populateSimpleDatabase"><code class="name flex">
+<span>def <span class="ident">populateSimpleDatabase</span></span>(<span>self, ids=0, timestamp=2000000000.0)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def populateSimpleDatabase(self, ids=0, timestamp=2000000000.0000):
+    d = Database(&#34;test_settings.toml&#34;)
+    d.dropCollections()
+    d = Database(&#34;test_settings.toml&#34;)
+
+    d.addMachineType(type_id=ids, type_name=&#34;type 0&#34;)
+    d.addMachineType(type_id=ids + 1, type_name=&#34;type 1&#34;)
+    d.addRole(role_id=ids, role_name=&#34;admin&#34;, authorize_all=True)
+    d.addRole(role_id=ids + 1, role_name=&#34;user&#34;)
+    d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=ids)
+    d.addUser(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;, role_id=ids + 1)
+    d.addMachine(machine_id=ids, machine_name=&#34;DRILL0&#34;, machine_type=ids)
+    d.addMachine(machine_id=ids + 1, machine_name=&#34;DRILL1&#34;, machine_type=ids + 1)
+    d.addMaintenance(
+        maintenance_id=ids, hours_between=10, description=&#34;replace engine&#34;
+    )
+    d.addMaintenance(
+        maintenance_id=ids + 1, hours_between=10, description=&#34;replace brushes&#34;
+    )
+    d.addIntervention(
+        maintenance_id=ids,
+        user_id=ids,
+        machine_id=ids,
+        timestamp=timestamp,
+    )
+    return d</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_connection"><code class="name flex">
+<span>def <span class="ident">test_connection</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_connection(self):
+    _ = Database(&#34;test_settings.toml&#34;)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_drop"><code class="name flex">
+<span>def <span class="ident">test_drop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_drop(self):
+    d = Database(&#34;test_settings.toml&#34;)
+    d.dropCollections()
+    self.assertEqual(len(d.listMachines()), 0)
+    self.assertEqual(len(d.listMachineTypes()), 0)
+    self.assertEqual(len(d.listMaintenances()), 0)
+    self.assertEqual(len(d.listMachines()), 0)
+    self.assertEqual(len(d.listUsers()), 0)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_get_user_authorizations"><code class="name flex">
+<span>def <span class="ident">test_get_user_authorizations</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_user_authorizations(self):
+    d = self.populateSimpleDatabase()
+
+    # check the authorization
+    d.setUserAuthorization(0, [0])
+    auth = d.isUserAuthroizedForMachine(machine_id=0, user_id=0)
+    self.assertTrue(auth)
+
+    # add user with UUID
+    card_UUID = &#34;1234567890&#34;
+    d.setUserCardUUID(user_id=1, card_UUID=card_UUID)
+    # test its authorizations
+    d.setUserAuthorization(1, [0])
+    auth = d.isUserAuthroizedForMachine(machine_id=0, card_UUID=card_UUID)
+    self.assertTrue(auth)
+    d.setUserAuthorization(1, [0, 1])
+    auth = d.isUserAuthroizedForMachine(machine_id=1, card_UUID=card_UUID)
+    self.assertTrue(auth)
+    d.setUserAuthorization(1, [])
+    for x in range(2):
+        auth = d.isUserAuthroizedForMachine(machine_id=x, card_UUID=card_UUID)
+        self.assertFalse(auth)
+
+    # test invalid query
+    with self.assertRaises(InvalidQueryException):
+        d.isUserAuthroizedForMachine(machine_id=0)
+    with self.assertRaises(InvalidQueryException):
+        d.isUserAuthroizedForMachine(machine_id=0, card_UUID=&#34;LMAO&#34;)
+    # test invalid ids
+    with self.assertRaises(InvalidIdException):
+        d.isUserAuthroizedForMachine(machine_id=0, user_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.isUserAuthroizedForMachine(machine_id=10, user_id=0)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_interventions"><code class="name flex">
+<span>def <span class="ident">test_interventions</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_interventions(self):
+    d = self.populateSimpleDatabase(ids=0, timestamp=time())
+
+    intervention_id = d.addIntervention(maintenance_id=0, user_id=0, machine_id=0)
+
+    # test get set
+    self.assertEqual(intervention_id, len(d.listInterventions()) - 1)
+    self.assertEqual(d.getInterventionUser(0).user_id, 0)
+    self.assertEqual(d.getInterventionMachine(0).machine_id, 0)
+    self.assertAlmostEqual(d.getInterventionTimestamp(0), time(), delta=1000)
+    self.assertEqual(
+        d.getIntervention(intervention_id=intervention_id).intervention_id,
+        intervention_id,
+    )
+
+    # test invalid ids
+    with self.assertRaises(InvalidIdException):
+        d.addIntervention(maintenance_id=10, machine_id=0, user_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.addIntervention(maintenance_id=0, machine_id=10, user_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.addIntervention(maintenance_id=0, machine_id=0, user_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getIntervention(intervention_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getInterventionUser(intervention_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getInterventionMachine(intervention_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getInterventionTimestamp(intervention_id=10)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_long_add_users"><code class="name flex">
+<span>def <span class="ident">test_long_add_users</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_long_add_users(self):
+    d = self.initDatabase()
+
+    USERS = 100
+    name = &#34;Mario&#34;
+    surname = &#34;Rossi&#34;
+
+    d.addRole(0, &#34;admin&#34;)
+
+    for _ in range(USERS):
+        d.addUser(name, surname, 0)
+    self.assertEqual(len(d.listUsers()), USERS)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_machine_maintenance_interaction"><code class="name flex">
+<span>def <span class="ident">test_machine_maintenance_interaction</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_machine_maintenance_interaction(self):
+    d = self.initDatabase()
+
+    MACHINE_TYPE = &#34;drill&#34;
+    MACHINES = 3
+    # create simple machine types
+    d.addMachineType(type_id=0, type_name=MACHINE_TYPE)
+
+    # create simple machine
+    for x in range(MACHINES):
+        d.addMachine(x, f&#34;TEST{x}&#34;, 0, 0)
+
+    # create simple maintenances
+    MAINTENANCES_DESC = [&#34;change oil&#34;, &#34;clean mirror&#34;, &#34;empty bin&#34;]
+    for i, m in enumerate(MAINTENANCES_DESC):
+        d.addMaintenance(maintenance_id=i, description=m, hours_between=10)
+        d.addMachineMaintenance(i, i)
+        self.assertEqual(len(d.getMachineMaintenances(i)), 1)
+        self.assertEqual(d.getMachineMaintenances(i)[0].maintenance_id, i)
+        self.assertEqual(
+            d.getMachineMaintenances(i)[0].description, MAINTENANCES_DESC[i]
+        )
+
+    # remove maintenances from machines
+    for x in range(MACHINES):
+        d.removeMachineMaintenance(x, x)
+        self.assertEqual(len(d.getMachineMaintenances(x)), 0)
+
+    # remove maintenances
+    for i in range(len(MAINTENANCES_DESC)):
+        d.removeMaintenance(i)
+        self.assertEqual(len(d.listMaintenances()), len(MAINTENANCES_DESC) - i - 1)
+    # check that everything was removed
+    self.assertEqual(len(d.listMaintenances()), 0)
+
+    d.addMaintenance(hours_between=10, description=&#34;test&#34;, maintenance_id=0)
+    # test invalid ids
+    with self.assertRaises(InvalidIdException):
+        d.addMachineMaintenance(machine_id=0, maintenance_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.addMachineMaintenance(machine_id=10, maintenance_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.getMachineMaintenances(machine_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.removeMachineMaintenance(machine_id=10, maintenance_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.removeMachineMaintenance(machine_id=0, maintenance_id=10)
+
+    # test remove maintenance that&#39;s nto present
+    with self.assertRaises(InvalidIdException):
+        d.removeMachineMaintenance(machine_id=0, maintenance_id=0)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_machine_multiple_maintenances"><code class="name flex">
+<span>def <span class="ident">test_machine_multiple_maintenances</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_machine_multiple_maintenances(self):
+    # test multiple maintenances in machine
+    d = self.populateSimpleDatabase()
+    d.addMachineMaintenance(0, 0)
+    self.assertEqual(len(d.getMachineMaintenances(0)), 1)
+    d.addMachineMaintenance(0, 1)
+    self.assertEqual(len(d.getMachineMaintenances(0)), 2)
+    maintenance_ids = [m.maintenance_id for m in d.getMachineMaintenances(0)]
+    self.assertListEqual(maintenance_ids, [0, 1])
+    d.removeMachineMaintenance(0, 0)
+    self.assertEqual(len(d.getMachineMaintenances(0)), 1)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_machines"><code class="name flex">
+<span>def <span class="ident">test_machines</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_machines(self):
+    d = self.initDatabase()
+
+    TYPES = 10
+    MACHINES = 10
+    current_id = 0
+
+    # create machines for each type
+    for i in range(TYPES):
+        NAME = random_string(10)
+        d.addMachineType(type_id=i, type_name=NAME)
+        self.assertEqual(len(d.listMachineTypes()), i + 1)
+        for _ in range(MACHINES):
+            name = random_string(6)
+            d.addMachine(
+                machine_id=current_id,
+                machine_name=name,
+                machine_type=i,
+            )
+            current_id += 1
+
+    # test that they have been added
+    self.assertEqual(MACHINES * TYPES, len(d.listMachines()))
+
+    for current_id in range(MACHINES * TYPES):
+        self.assertEqual(d.getMachine(current_id).machine_id, current_id)
+        hours = random_between(10, 1000)
+        d.setMachinesHours(current_id, hours)
+        self.assertEqual(d.getMachineHours(current_id), hours)
+
+    for current_id in range(MACHINES * TYPES):
+        # test rename
+        NAME = random_string(10)
+        d.setMachineName(current_id, NAME)
+        self.assertEqual(d.getMachineName(current_id), NAME)
+        # test new type
+        NEW_TYPE = randint(0, TYPES - 1)
+        d.setMachineMachineType(current_id, NEW_TYPE)
+        self.assertEqual(NEW_TYPE, d.getMachineMachineType(current_id))
+
+        d.removeMachine(current_id)
+        # test delete
+        self.assertEqual(MACHINES * TYPES - current_id - 1, len(d.listMachines()))
+
+    # test delete
+    self.assertEqual(0, len(d.listMachines()))
+
+    # test invalid machine types
+    with self.assertRaises(InvalidQueryException):
+        d.addMachine(0, &#34;&#34;, 10)
+
+    d.addMachine(machine_id=0, machine_name=&#34;drill&#34;, machine_type=0)
+    # test invalid machine id
+    with self.assertRaises(DuplicatedIdException):
+        d.addMachine(machine_id=0, machine_name=&#34;drill&#34;, machine_type=0)
+    with self.assertRaises(InvalidIdException):
+        d.getMachine(machine_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getMachineHours(machine_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getMachineMachineType(machine_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.setMachineMachineType(machine_id=10, machine_type=10)
+    with self.assertRaises(InvalidIdException):
+        d.getMachineName(machine_id=10)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_maintenances"><code class="name flex">
+<span>def <span class="ident">test_maintenances</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_maintenances(self):
+    d = self.initDatabase()
+
+    MAINTENANCES = 100
+
+    for x in range(MAINTENANCES):
+        hours_between = random_between(5, 10)
+        description = random_string(50)
+        new_id = d.addMaintenance(hours_between, description)
+        # check if the new id is the same as the index
+        self.assertEqual(x, new_id)
+        # check getters and setters
+        self.assertEqual(d.getMaintenanceHoursBetween(new_id), hours_between)
+        self.assertEqual(d.getMaintenanceDescription(new_id), description)
+
+        hours_between = random_between(5, 10)
+        description = random_string(50)
+        d.setMaintenanceHoursBetween(x, hours_between)
+        d.setMaintenanceDescription(x, description)
+        self.assertEqual(d.getMaintenanceHoursBetween(new_id), hours_between)
+        self.assertEqual(d.getMaintenanceDescription(new_id), description)
+
+    # check get
+    self.assertEqual(d.getMaintenance(maintenance_id=0).maintenance_id, 0)
+
+    # check removal
+    for x in range(MAINTENANCES):
+        d.removeMaintenance(x)
+        self.assertEqual(MAINTENANCES - x - 1, len(d.listMaintenances()))
+        d.removeMaintenance(x)
+        self.assertEqual(MAINTENANCES - x - 1, len(d.listMaintenances()))
+
+    self.assertEqual(len(d.listMaintenances()), 0)
+
+    # check invalid ids
+    with self.assertRaises(InvalidIdException):
+        d.getMaintenance(maintenance_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getMaintenanceDescription(maintenance_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getMaintenanceHoursBetween(maintenance_id=10)
+
+    # check double add
+    d.addMaintenance(maintenance_id=0, description=&#34;WHAT&#34;, hours_between=10)
+    with self.assertRaises(DuplicatedIdException):
+        d.addMaintenance(
+            maintenance_id=0, description=&#34;YOU AGAIN&#34;, hours_between=10
+        )</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_roles"><code class="name flex">
+<span>def <span class="ident">test_roles</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_roles(self):
+    d = self.initDatabase()
+    d.addRole(0, &#34;admin&#34;)
+    d.addRole(1, &#34;user&#34;)
+
+    user_id = d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=0)
+    d.setUserRole(user_id=user_id, role_id=1)
+    self.assertEqual(d.getUserRole(user_id=user_id).role_id, 1)
+
+    with self.assertRaises(InvalidIdException):
+        d.setUserRole(user_id=user_id, role_id=4)
+
+    with self.assertRaises(InvalidIdException):
+        d.getUserRole(user_id=10)
+
+    with self.assertRaises(InvalidIdException):
+        d.getRole(10)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_set_authorizations"><code class="name flex">
+<span>def <span class="ident">test_set_authorizations</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_set_authorizations(self):
+    d = self.populateSimpleDatabase()
+    # test user auth
+    d.setUserAuthorization(1, [0])
+    authorization_ids = [t.type_id for t in d.getUserAuthorization(1)]
+    self.assertListEqual(authorization_ids, [0])
+    # test admin auth
+    d.setUserAuthorization(0, [])
+    self.assertTrue(d.isUserAuthroizedForMachine(machine_id=0, user_id=0))
+
+    # test invalid authorization
+    with self.assertRaises(InvalidQueryException):
+        d.setUserAuthorization(0, 0)
+    with self.assertRaises(InvalidIdException):
+        d.setUserAuthorization(0, [10, 20])
+    # test invalid user id
+    with self.assertRaises(InvalidIdException):
+        d.getUserAuthorization(10)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_simple_add_roles"><code class="name flex">
+<span>def <span class="ident">test_simple_add_roles</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_simple_add_roles(self):
+    d = self.initDatabase()
+
+    role_names = [&#34;user&#34;, &#34;power user&#34;, &#34;moderator&#34;, &#34;crew&#34;, &#34;admin&#34;, &#34;super admin&#34;]
+
+    for i, r in enumerate(role_names):
+        d.addRole(i, r)
+
+    # check if roles were added
+    self.assertEqual(len(role_names), len(d.listRoles()))
+
+    # check if role parameters are real
+    for i, r in enumerate(d.listRoles()):
+        self.assertEqual(r.role_id, i)
+        self.assertEqual(r.role_name, role_names[i])
+
+    # edit a role name
+    new_name = &#34;TEST ROLE WOW&#34;
+    d.editRoleName(0, new_name)
+    self.assertEqual(d.getRole(0).role_name, new_name)
+    self.assertEqual(len(d.listRoles()), len(role_names))
+
+    # create a new role
+    new_role = &#34;ÜBER ADMIN&#34;
+    d.addRole(len(role_names) + 1, new_role)
+    self.assertEqual(len(d.listRoles()), len(role_names) + 1)
+    self.assertEqual(d.getRole(len(d.listRoles())).role_name, new_role)
+
+    # remove a role
+    d.removeRole(0)
+    self.assertEqual(len(d.listRoles()), len(role_names))
+    # add a new role
+    d.addRole(&#34;ÜBERÜBER ADMIN&#34;, 1000)
+    self.assertEqual(len(d.listRoles()), len(role_names) + 1)
+
+    # add a duplicate role and catch exception
+    d.addRole(&#34;0&#34;, &#34;aaa&#34;)
+    with self.assertRaises(DuplicatedIdException):
+        d.addRole(&#34;0&#34;, &#34;duplicate&#34;)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_types"><code class="name flex">
+<span>def <span class="ident">test_types</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_types(self):
+    d = self.initDatabase()
+    type_names = [&#34;3d printer&#34;, &#34;laser cutter&#34;, &#34;vertical drill&#34;, &#34;saw&#34;]
+
+    for i, t in enumerate(type_names):
+        d.addMachineType(i, t)
+
+    # check if types were added
+    self.assertEqual(len(d.listMachineTypes()), len(type_names))
+
+    # rename a machine type
+    new_name = &#34;TEST TYPE WOW&#34;
+    d.editMachineTypeName(0, new_name)
+    self.assertEqual(d.getMachineType(0).type_name, new_name)
+
+    # add a new type
+    new_type = &#34;ÜBER TYPE&#34;
+    d.addMachineType(len(type_names) + 1, new_type)
+    self.assertEqual(len(d.listMachineTypes()), len(type_names) + 1)
+    self.assertEqual(d.getMachineType(len(type_names) + 1).type_name, new_type)
+
+    # remove a type
+    d.removeMachineType(0)
+    self.assertEqual(len(d.listMachineTypes()), len(type_names))
+    # add a new type
+    d.addMachineType(&#34;ÜBERÜBER TYPE&#34;, 1000)
+    self.assertEqual(len(d.listMachineTypes()), len(type_names) + 1)
+
+    # add a duplicated type and catch the exception
+    d.addMachineType(&#34;0&#34;, &#34;aaa&#34;)
+    with self.assertRaises(DuplicatedIdException):
+        d.addMachineType(&#34;0&#34;, &#34;duplicate&#34;)
+
+    # test get machine type
+    with self.assertRaises(InvalidIdException):
+        d.getMachineType(10)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_use_helpers"><code class="name flex">
+<span>def <span class="ident">test_use_helpers</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_use_helpers(self):
+    d = self.populateSimpleDatabase()
+    DURATION = 2 * 3600
+    CARD_UUID = &#34;ABCD1234&#34;
+
+    # test simple use
+    d.startUse(machine_id=0, user_id=0)
+    elapsed = d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+    uses = d.getUserUses(user_id=0)
+    in_use = d.getCurrentlyUsedMachines()
+    self.assertEqual(len(uses), 1)
+    self.assertEqual(len(in_use), 0)
+    self.assertAlmostEqual(elapsed, DURATION, places=2)
+
+    # test total time
+    d.setUserCardUUID(user_id=1, card_UUID=CARD_UUID)
+    d.startUse(machine_id=1, user_id=1)
+    elapsed = d.endUse(machine_id=1, user_id=1, timestamp=time() + DURATION)
+    uses = d.getUserUses(user_id=1)
+    in_use = d.getCurrentlyUsedMachines()
+    self.assertEqual(len(uses), 1)
+    self.assertEqual(len(in_use), 0)
+    self.assertEqual(d.getUserTotalTime(user_id=1), elapsed)
+
+    # test in use
+    d.startUse(machine_id=0, user_id=0)
+    in_use = d.isMachineCurrentlyUsed(machine_id=0)
+    self.assertTrue(in_use)
+    d.endUse(machine_id=0, user_id=0, timestamp=time() + DURATION)
+    in_use = d.isMachineCurrentlyUsed(machine_id=0)
+    self.assertFalse(in_use)
+    in_use = d.isMachineCurrentlyUsed(machine_id=1)
+    self.assertFalse(in_use)
+
+    # test start machine that&#39;s being used
+    d.startUse(machine_id=0, user_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.startUse(machine_id=0, user_id=1)
+
+    # test invalid ids
+    with self.assertRaises(InvalidIdException):
+        d.getUserUses(user_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.isMachineCurrentlyUsed(machine_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.getUserTotalTime(user_id=10)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_user_use_interaction"><code class="name flex">
+<span>def <span class="ident">test_user_use_interaction</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_user_use_interaction(self):
+    d = self.populateSimpleDatabase()
+    d.startUse(machine_id=0, user_id=0, timestamp=time())
+    duration = d.endUse(machine_id=0, user_id=0, timestamp=time() + 1000)
+    self.assertAlmostEqual(duration, 1000, places=2)
+    d.startUse(machine_id=1, user_id=1)
+    duration = d.endUse(machine_id=1, user_id=1)
+    self.assertAlmostEqual(duration, 0, places=2)
+
+    # test invalid ids
+    with self.assertRaises(InvalidIdException):
+        d.startUse(machine_id=0, user_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.startUse(machine_id=10, user_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.endUse(machine_id=0, user_id=10)
+    with self.assertRaises(InvalidIdException):
+        d.endUse(machine_id=10, user_id=0)
+
+    # test end before start
+    with self.assertRaises(InvalidQueryException):
+        d.endUse(machine_id=0, user_id=0)</code></pre>
+</details>
+</dd>
+<dt id="tests.TestDB.test_users"><code class="name flex">
+<span>def <span class="ident">test_users</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_users(self):
+    d = self.initDatabase()
+    d.addRole(0, &#34;admin&#34;)
+
+    names = [&#34;Alessandro&#34;, &#34;Lorenzo&#34;, &#34;Diego&#34;, &#34;Tommaso&#34;, &#34;Riccardo&#34;]
+    surnames = [
+        &#34;Rossi&#34;,
+        &#34;Bianchi&#34;,
+        &#34;Verdi&#34;,
+        &#34;Colombo&#34;,
+        &#34;Fumagalli&#34;,
+    ]
+
+    # just to make sure
+    self.assertEqual(len(names), len(surnames))
+
+    ids = []
+    # add roles
+    for n, s in zip(names, surnames):
+        user_id = d.addUser(n, s, 0)
+        self.assertEqual(d.getUserId(n, s), user_id)
+        ids.append(user_id)
+
+    # check if roles were added
+    self.assertEqual(len(d.listUsers()), len(names))
+    # check that every role is unique
+    self.assertEqual(len(ids), len(set(ids)))
+
+    # set a new ID
+    for x in range(len(names)):
+        d.setUserId(x, 1000 + x)
+    # check that the ids are equal
+    ids = [u.user_id for u in d.listUsers()]
+    self.assertListEqual(list(x + 1000 for x in range(len(names))), ids)
+
+    # get a user from name
+    n, s = names[0], surnames[0]
+    u = d.getUser(user_name=n, user_surname=s)
+    self.assertEqual(u.name, n)
+    self.assertEqual(u.surname, s)
+
+    # get a user from id
+    p = d.getUser(u.user_id)
+    self.assertEqual(p.user_id, u.user_id)
+
+    # set a user card
+    UUID = random_string()
+    d.setUserCardUUID(u.user_id, UUID)
+    self.assertEqual(UUID, d.getUserCardUUID(u.user_id))
+
+    # add another user
+    d.addUser(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;, role_id=0, user_id=0)
+    # test get id
+    user_id = d.getUserId(name=&#34;Andrea&#34;, surname=&#34;Bianchi&#34;)
+    self.assertEqual(user_id, 0)
+
+    # test  invalid name
+    with self.assertRaises(InvalidQueryException):
+        d.getUserId(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;)
+
+    # test invalid role
+    with self.assertRaises(InvalidIdException):
+        d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=10)
+
+    # test invalid id
+    with self.assertRaises(DuplicatedIdException):
+        d.addUser(name=&#34;Mario&#34;, surname=&#34;Rossi&#34;, role_id=0, user_id=0)
+    with self.assertRaises(InvalidIdException):
+        d.getUser(10)
+    with self.assertRaises(InvalidIdException):
+        d.getUserCardUUID(10)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="tests.random" href="#tests.random">random</a></code></li>
+<li><code><a title="tests.random_between" href="#tests.random_between">random_between</a></code></li>
+<li><code><a title="tests.random_string" href="#tests.random_string">random_string</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="tests.TestDB" href="#tests.TestDB">TestDB</a></code></h4>
+<ul class="">
+<li><code><a title="tests.TestDB.initDatabase" href="#tests.TestDB.initDatabase">initDatabase</a></code></li>
+<li><code><a title="tests.TestDB.populateSimpleDatabase" href="#tests.TestDB.populateSimpleDatabase">populateSimpleDatabase</a></code></li>
+<li><code><a title="tests.TestDB.test_connection" href="#tests.TestDB.test_connection">test_connection</a></code></li>
+<li><code><a title="tests.TestDB.test_drop" href="#tests.TestDB.test_drop">test_drop</a></code></li>
+<li><code><a title="tests.TestDB.test_get_user_authorizations" href="#tests.TestDB.test_get_user_authorizations">test_get_user_authorizations</a></code></li>
+<li><code><a title="tests.TestDB.test_interventions" href="#tests.TestDB.test_interventions">test_interventions</a></code></li>
+<li><code><a title="tests.TestDB.test_long_add_users" href="#tests.TestDB.test_long_add_users">test_long_add_users</a></code></li>
+<li><code><a title="tests.TestDB.test_machine_maintenance_interaction" href="#tests.TestDB.test_machine_maintenance_interaction">test_machine_maintenance_interaction</a></code></li>
+<li><code><a title="tests.TestDB.test_machine_multiple_maintenances" href="#tests.TestDB.test_machine_multiple_maintenances">test_machine_multiple_maintenances</a></code></li>
+<li><code><a title="tests.TestDB.test_machines" href="#tests.TestDB.test_machines">test_machines</a></code></li>
+<li><code><a title="tests.TestDB.test_maintenances" href="#tests.TestDB.test_maintenances">test_maintenances</a></code></li>
+<li><code><a title="tests.TestDB.test_roles" href="#tests.TestDB.test_roles">test_roles</a></code></li>
+<li><code><a title="tests.TestDB.test_set_authorizations" href="#tests.TestDB.test_set_authorizations">test_set_authorizations</a></code></li>
+<li><code><a title="tests.TestDB.test_simple_add_roles" href="#tests.TestDB.test_simple_add_roles">test_simple_add_roles</a></code></li>
+<li><code><a title="tests.TestDB.test_types" href="#tests.TestDB.test_types">test_types</a></code></li>
+<li><code><a title="tests.TestDB.test_use_helpers" href="#tests.TestDB.test_use_helpers">test_use_helpers</a></code></li>
+<li><code><a title="tests.TestDB.test_user_use_interaction" href="#tests.TestDB.test_user_use_interaction">test_user_use_interaction</a></code></li>
+<li><code><a title="tests.TestDB.test_users" href="#tests.TestDB.test_users">test_users</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
