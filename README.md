@@ -84,6 +84,20 @@ The admin endpoint is a pc based application to which an admin has access. It mi
 
 ## Server side
 
+### Sequence diagrams
+
+#### Keep alive diagram
+
+![keep alive](images/sequence_diagram/keep_alive_diagram.png)
+
+#### Machine connection diagram
+
+![machine connection](images/sequence_diagram/machine_connection_diagram.png)
+
+#### User interaction diagram
+
+![user interaction](images/sequence_diagram/user_interaction_diagram.png)
+
 ### Frontend
 
 ### Backend

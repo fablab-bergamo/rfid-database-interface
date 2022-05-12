@@ -1,7 +1,15 @@
 """This is the class handling the Database. More to come."""
 
-from entities import User, Role, MachineType, Machine, Maintenance, Intervention, Use
-from exceptions import (
+from dependencies.entities import (
+    User,
+    Role,
+    MachineType,
+    Machine,
+    Maintenance,
+    Intervention,
+    Use,
+)
+from dependencies.exceptions import (
     DuplicatedIdException,
     InvalidIdException,
     InvalidQueryException,
