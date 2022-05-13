@@ -98,6 +98,15 @@ The admin endpoint is a pc based application to which an admin has access. It mi
 
 ![user interaction](images/sequence_diagram/user_interaction_diagram.png)
 
+### MQTT interface
+
+When the machine connects:
+
+1. publish a message "connect" to the topic "machine/<machine_id>"
+2. periodically publish a message "alive" to the topic "machine/<machine_id>"
+
+both message and topics can be changed by editing the settings.toml file.
+
 ### Frontend
 
 ### Backend
