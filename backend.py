@@ -1,27 +1,36 @@
 from mqtt import MQTTInterface
-from time import sleep
+from database import DatabaseInterface
+from time import sleep, time
 
 
-def machineAlive(machine: str):
-    print(f"Machine {machine} is still alive")
+class Backend:
+    def __init__(self):
+        self._m = MQTTInterface()
+        self._m.setMachineAliveCallback(self.machineAlive)
+        self._m.isMachicineAuthorizedCallback(self.isMachineAuthorized)
 
+        self._db = DatabaseInterface()
+        self._last_alive = {}
 
-def machineConnected(machine: str):
-    print(f"Machine {machine} is connected")
+    def machineAlive(self, machine_id: str):
+        self._last_alive[machine_id] = time()
+
+    def isMachineAuthorized(self, machine_id: str):
+        pass
+
+    def connect(self):
+        self._m.connect()
+
+    def disconnect(self):
+        self._m.disconnect()
 
 
 def main():
-    m = MQTTInterface()
-    m.setMachineAliveCallback(machineAlive)
-    m.setMachineConnectedCallback(machineConnected)
+    b = Backend()
+    b.connect()
 
-    m.connect()
-
-    while m.connected:
-        sleep(0.01)
-
-    m.unsubscribe()
-    m.disconnect()
+    while True:
+        sleep(1)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ from string import ascii_uppercase
 from random import choices, randint, random
 
 from database import (
-    Database,
+    DatabaseInterface,
     DuplicatedIdException,
     InvalidIdException,
     InvalidQueryException,
@@ -22,14 +22,14 @@ def random_between(a, b):
 
 class TestDB(unittest.TestCase):
     def initDatabase(self):
-        d = Database("test_settings.toml")
+        d = DatabaseInterface("test_settings.toml")
         d.dropCollections()
-        return Database("test_settings.toml")
+        return DatabaseInterface("test_settings.toml")
 
     def populateSimpleDatabase(self, ids=0, timestamp=2000000000.0000):
-        d = Database("test_settings.toml")
+        d = DatabaseInterface("test_settings.toml")
         d.dropCollections()
-        d = Database("test_settings.toml")
+        d = DatabaseInterface("test_settings.toml")
 
         d.addMachineType(type_id=ids, type_name="type 0")
         d.addMachineType(type_id=ids + 1, type_name="type 1")
@@ -54,10 +54,10 @@ class TestDB(unittest.TestCase):
         return d
 
     def test_connection(self):
-        _ = Database("test_settings.toml")
+        _ = DatabaseInterface("test_settings.toml")
 
     def test_drop(self):
-        d = Database("test_settings.toml")
+        d = DatabaseInterface("test_settings.toml")
         d.dropCollections()
         self.assertEqual(len(d.listMachines()), 0)
         self.assertEqual(len(d.listMachineTypes()), 0)

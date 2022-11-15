@@ -7,8 +7,12 @@ class MQTTInterface:
         self._settings_path = path
 
         self._messageCallback = None
-        self._machineConnectedCallback = None
+        self._isMachineAuthorizedCallback = None
+        self._machineAliveCallback = None
         self._connected = False
+
+        self._awaiting_authorization = set()
+        self._machineAlive = {}
 
         self._loadSettings()
 
@@ -40,11 +44,12 @@ class MQTTInterface:
 
         match message:
             case self._connect_message:
-                if self._machineConnectedCallback is not None:
-                    self._machineConnectedCallback(machine)
+                self._awaiting_authorization.add(machine)
+                if self._isMachineAuthorizedCallback is not None:
+                    self._isMachineAuthorizedCallback(machine)
 
             case self._alive_message:
-                if self._machineConnectedCallback is not None:
+                if self._machineAliveCallback is not None:
                     self._machineAliveCallback(machine)
 
     def _onDisconnect(self, *args):
@@ -53,6 +58,8 @@ class MQTTInterface:
     def connect(self):
         self._client = mqtt.Client(self._client_id)
         self._client.on_message = self._onMessage
+        self._client.on_disconnect = self._onDisconnect
+
         self._client.connect(self._broker, port=self._port)
         self._connected = True
         self._client.subscribe(self._topic)
@@ -61,8 +68,8 @@ class MQTTInterface:
     def setMessageCallback(self, callback: callable):
         self._messageCallback = callback
 
-    def setMachineConnectedCallback(self, callback: callable):
-        self._machineConnectedCallback = callback
+    def isMachineAuthorizedCallback(self, callback: callable):
+        self._isMachineAuthorizedCallback = callback
 
     def setMachineAliveCallback(self, callback: callable):
         self._machineAliveCallback = callback

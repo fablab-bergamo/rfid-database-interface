@@ -245,7 +245,7 @@ class DatabaseHelper(DatabaseBackend):
         return User.from_dict(result)
 
 
-class Database(DatabaseHelper):
+class DatabaseInterface(DatabaseHelper):
     def __init__(self, settings_path="settings.toml") -> None:
         super().__init__(settings_path)
 
